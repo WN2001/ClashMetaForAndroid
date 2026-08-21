@@ -56,7 +56,7 @@
     <dimen name="proxy_text_margin_grid3">5dp</dimen>
     <dimen name="proxy_text_size">12sp</dimen>
     <dimen name="proxy_text_size_grid3">11sp</dimen>
-    <dimen name="proxy_card_radius">12dp</dimen>
+    <dimen name="proxy_card_radius">16dp</dimen>
     <dimen name="proxy_card_offset">0dp</dimen>
 
     <dimen name="properties_element_margin_vertical">2.5dp</dimen>
@@ -66,4 +66,13 @@
 
     <dimen name="logcat_padding_vertical">12dp</dimen>
     <dimen name="logcat_padding_horizontal">12dp</dimen>
+
+    <!-- M3 图标容器（40dp 容器 + 24dp 图标，符合 M3 比例） -->
+    <dimen name="icon_container_size">40dp</dimen>
+    <dimen name="icon_container_radius">12dp</dimen>
+
+    <!-- 统一卡片刻度 -->
+    <dimen name="card_radius">16dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_margin_vertical">5dp</dimen>
 </resources>

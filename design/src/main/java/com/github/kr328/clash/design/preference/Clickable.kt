@@ -28,9 +28,9 @@ fun PreferenceScreen.clickable(
 
     val impl = object : ClickablePreference {
         override var icon: Drawable?
-            get() = binding.iconView.background
+            get() = binding.iconView.drawable
             set(value) {
-                binding.iconView.background = value
+                binding.iconView.setImageDrawable(value)
                 binding.iconView.visibility = if (value == null) View.GONE else View.VISIBLE
             }
         override var title: CharSequence
@@ -56,9 +56,7 @@ fun PreferenceScreen.clickable(
 
     impl.title = context.getText(title)
 
-    if (icon != null) {
-        impl.icon = context.getDrawableCompat(icon)
-    }
+    impl.icon = if (icon != null) context.getDrawableCompat(icon) else null
 
     if (summary != null) {
         impl.summary = context.getText(summary)

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- 占位色，被 ImageView 的 backgroundTint=?attr/colorPrimaryContainer 覆盖；必须不透明否则 tint 不可见 -->
+    <solid android:color="@android:color/white" />
+    <corners android:radius="@dimen/icon_container_radius" />
+</shape>

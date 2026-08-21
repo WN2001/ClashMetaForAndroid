@@ -12,11 +12,15 @@
         android:paddingVertical="@dimen/item_padding_vertical"
         android:paddingEnd="@dimen/item_tailing_margin">
 
-        <View
+        <ImageView
             android:id="@+id/icon_view"
-            android:layout_width="@dimen/item_header_component_size"
-            android:layout_height="@dimen/item_header_component_size"
-            android:layout_marginHorizontal="@dimen/item_header_margin" />
+            android:layout_width="@dimen/icon_container_size"
+            android:layout_height="@dimen/icon_container_size"
+            android:layout_marginHorizontal="@dimen/item_header_margin"
+            android:background="@drawable/bg_icon_container"
+            android:backgroundTint="?attr/colorPrimaryContainer"
+            android:scaleType="center"
+            android:tint="?attr/colorOnPrimaryContainer" />
 
         <LinearLayout
             android:layout_width="match_parent"

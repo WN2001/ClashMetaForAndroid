@@ -1,8 +1,10 @@
 package com.github.kr328.clash.design.view
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.view.View
 import androidx.annotation.AttrRes
 import com.github.kr328.clash.design.R
 import com.github.kr328.clash.design.databinding.ComponentLargeActionLabelBinding
@@ -30,9 +32,10 @@ class LargeActionCard @JvmOverloads constructor(
         }
 
     var icon: Drawable?
-        get() = binding.iconView.background
+        get() = binding.iconView.drawable
         set(value) {
-            binding.iconView.background = value
+            binding.iconView.setImageDrawable(value)
+            binding.iconView.visibility = if (value == null) View.GONE else View.VISIBLE
         }
 
     init {
@@ -49,9 +52,18 @@ class LargeActionCard @JvmOverloads constructor(
             0
         ).apply {
             try {
+                val useContainer = getBoolean(R.styleable.LargeActionCard_iconContainer, true)
                 icon = getDrawable(R.styleable.LargeActionCard_icon)
                 text = getString(R.styleable.LargeActionCard_text)
                 subtext = getString(R.styleable.LargeActionCard_subtext)
+
+                // hero 状态卡（iconContainer=false）：背景已是强色，不套容器，图标用 onPrimary
+                if (!useContainer) {
+                    binding.iconView.background = null
+                    binding.iconView.imageTintList = ColorStateList.valueOf(
+                        context.resolveThemedColor(com.google.android.material.R.attr.colorOnPrimary)
+                    )
+                }
             } finally {
                 recycle()
             }

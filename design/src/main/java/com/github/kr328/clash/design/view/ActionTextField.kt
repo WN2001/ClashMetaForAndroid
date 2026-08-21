@@ -3,6 +3,7 @@ package com.github.kr328.clash.design.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
@@ -20,9 +21,10 @@ class ActionTextField @JvmOverloads constructor(
         .inflate(context.layoutInflater, this, true)
 
     var icon: Drawable?
-        get() = binding.iconView.background
+        get() = binding.iconView.drawable
         set(value) {
-            binding.iconView.background = value
+            binding.iconView.setImageDrawable(value)
+            binding.iconView.visibility = if (value == null) View.GONE else View.VISIBLE
         }
 
     var title: CharSequence?
