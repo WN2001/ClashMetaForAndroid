@@ -19,11 +19,11 @@
     </data>
 
     <RelativeLayout
-        android:elevation="5dp"
+        android:elevation="@dimen/card_elevation"
         android:id="@+id/root_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="5dp"
+        android:layout_marginVertical="@dimen/card_margin_vertical"
         android:layout_marginHorizontal="@dimen/item_header_margin"
         android:background="@drawable/bg_b"
         android:foreground="?attr/selectableItemBackground"
@@ -118,7 +118,7 @@
             android:layout_width="2dp"
             android:layout_height="match_parent"
             android:layout_toStartOf="@id/menu_view"
-            android:background="@color/color_clash_dark" />
+            android:background="?attr/colorOutlineVariant" />
 
         <FrameLayout
             android:id="@+id/menu_view"

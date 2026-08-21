@@ -29,7 +29,7 @@ class ProxyViewConfig(val context: Context, var proxyLine: Int) {
         get() = if (proxyLine==2) context.getPixels(R.dimen.proxy_text_size).toFloat() else context.getPixels(R.dimen.proxy_text_size_grid3).toFloat()
 
     val shadow = Color.argb(
-        0x15,
+        0x08,
         Color.red(Color.DKGRAY),
         Color.green(Color.DKGRAY),
         Color.blue(Color.DKGRAY),
