@@ -117,13 +117,6 @@
                     app:icon="@drawable/ic_baseline_swap_vertical_circle"
                     app:text="@string/providers" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="56dp"
-                    android:background="@drawable/divider_list"
-                    android:visibility="@{clashRunning &amp;&amp; hasProviders ? View.VISIBLE : View.GONE}" />
-
                 <com.github.kr328.clash.design.view.LargeActionLabel
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -131,12 +124,6 @@
                     android:onClick="@{() -> self.request(Request.OpenLogs)}"
                     app:icon="@drawable/ic_baseline_assignment"
                     app:text="@string/logs" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="56dp"
-                    android:background="@drawable/divider_list" />
 
                 <com.github.kr328.clash.design.view.LargeActionLabel
                     android:layout_width="match_parent"
@@ -146,12 +133,6 @@
                     app:icon="@drawable/ic_baseline_settings"
                     app:text="@string/settings" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="56dp"
-                    android:background="@drawable/divider_list" />
-
                 <com.github.kr328.clash.design.view.LargeActionLabel
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -159,12 +140,6 @@
                     android:onClick="@{() -> self.request(Request.OpenHelp)}"
                     app:icon="@drawable/ic_baseline_help_center"
                     app:text="@string/help" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="56dp"
-                    android:background="@drawable/divider_list" />
 
                 <com.github.kr328.clash.design.view.LargeActionLabel
                     android:layout_width="match_parent"
