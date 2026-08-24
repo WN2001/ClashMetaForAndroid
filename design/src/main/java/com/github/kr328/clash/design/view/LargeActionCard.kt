@@ -1,5 +1,6 @@
 package com.github.kr328.clash.design.view
 
+import android.animation.AnimatorInflater
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
@@ -73,5 +74,7 @@ class LargeActionCard @JvmOverloads constructor(
         radius = context.getPixels(R.dimen.large_action_card_radius).toFloat()
         elevation = context.getPixels(R.dimen.large_action_card_elevation).toFloat()
         setCardBackgroundColor(context.resolveThemedColor(com.google.android.material.R.attr.colorSurfaceContainerHigh))
+        // 按下抬升反馈：按下时轻微上浮，松开回 0
+        stateListAnimator = AnimatorInflater.loadStateListAnimator(context, R.animator.card_pressed_state_anim)
     }
 }
