@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 打开新 Activity 时，旧页面退出动画（轻微缩小淡出，保留在底层感） -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:interpolator/fast_out_linear_in">
+    <alpha
+        android:fromAlpha="1.0"
+        android:toAlpha="0.6"
+        android:duration="220" />
+    <scale
+        android:fromXScale="1.0"
+        android:toXScale="0.97"
+        android:fromYScale="1.0"
+        android:toYScale="0.97"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:duration="220" />
+</set>
