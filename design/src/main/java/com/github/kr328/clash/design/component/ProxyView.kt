@@ -164,9 +164,7 @@ class ProxyView(
             val x = width - state.config.layoutPadding - state.config.contentPadding - delayWidth
             val y = height / 2f - textOffset
 
-            paint.color = state.delayColor
             drawText(state.delayText, 0, delayCount, x, y, paint)
-            paint.color = state.controls
         }
 
         // draw title

@@ -25,16 +25,6 @@ class ProxyViewState(
     var background: Int = config.unselectedBackground
     var controls: Int = config.unselectedControl
 
-    // 延迟数字按快慢分色（仅未选中态；选中态保持 onPrimary 白以保证强色背景对比度）
-    val delayColor: Int
-        get() = when {
-            selected -> config.selectedControl
-            delay <= 0 -> config.unselectedControl
-            delay < 100 -> Color.parseColor("#43A047")  // 绿 快
-            delay < 300 -> Color.parseColor("#F9A825")  // 黄 一般
-            else -> Color.parseColor("#E53935")         // 红 慢
-        }
-
     private var delay: Int = 0
     private var selected: Boolean = false
     private var parentNow: String = ""
