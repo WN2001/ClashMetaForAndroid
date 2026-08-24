@@ -20,6 +20,7 @@
 
     <RelativeLayout
         android:elevation="@dimen/card_elevation"
+        android:stateListAnimator="@animator/card_pressed_state_anim"
         android:id="@+id/root_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,6 +40,7 @@
             android:layout_height="@dimen/item_header_component_size"
             android:layout_centerVertical="true"
             android:layout_marginHorizontal="@dimen/item_header_margin"
+            android:buttonTint="?attr/colorPrimary"
             android:checked="@{profile.active}"
             android:clickable="false"
             android:focusable="false"
