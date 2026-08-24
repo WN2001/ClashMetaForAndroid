@@ -47,6 +47,7 @@
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true"
                 android:clipToPadding="false"
+                android:layoutAnimation="@anim/layout_animation_fall_down"
                 android:orientation="vertical"
                 android:paddingHorizontal="@dimen/main_padding_horizontal"
                 android:paddingTop="@{self.surface.insets.top}"
