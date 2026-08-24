@@ -37,6 +37,7 @@ class HelpDesign(
 
             clickable(
                 title = R.string.clash_wiki,
+                icon = R.drawable.ic_outline_article,
                 summary = R.string.clash_wiki_url
             ) {
                 clicked {
@@ -46,6 +47,7 @@ class HelpDesign(
 
             clickable(
                 title = R.string.clash_meta_wiki,
+                icon = R.drawable.ic_outline_article,
                 summary = R.string.clash_meta_wiki_url
             ) {
                 clicked {
@@ -57,6 +59,7 @@ class HelpDesign(
 
             clickable(
                 title = R.string.clash_meta_core,
+                icon = R.drawable.ic_baseline_extension,
                 summary = R.string.clash_meta_core_url
             ) {
                 clicked {
@@ -66,6 +69,7 @@ class HelpDesign(
 
             clickable(
                 title = R.string.clash_meta_for_android,
+                icon = R.drawable.ic_baseline_apps,
                 summary = R.string.meta_github_url
             ) {
                 clicked {

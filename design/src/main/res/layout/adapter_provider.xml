@@ -26,12 +26,25 @@
         android:paddingStart="@dimen/item_header_margin"
         android:paddingEnd="0dp">
 
+        <ImageView
+            android:id="@+id/icon_view"
+            android:layout_width="@dimen/icon_container_size"
+            android:layout_height="@dimen/icon_container_size"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="@dimen/item_header_margin"
+            android:background="@drawable/bg_icon_container"
+            android:backgroundTint="?attr/colorPrimaryContainer"
+            android:scaleType="center"
+            android:src="@drawable/ic_baseline_cloud_download"
+            android:tint="?attr/colorOnPrimaryContainer" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_toStartOf="@id/elapsed_view"
+            android:layout_toEndOf="@id/icon_view"
             android:orientation="vertical">
 
             <TextView
