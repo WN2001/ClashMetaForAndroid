@@ -104,7 +104,14 @@
                 android:alpha="0.96"
                 android:background="?android:windowBackground"
                 app:tabBackground="@android:color/transparent"
-                app:tabMode="scrollable" />
+                app:tabIndicator="@drawable/tab_indicator_pill"
+                app:tabIndicatorAnimationMode="elastic"
+                app:tabIndicatorColor="?attr/colorPrimary"
+                app:tabIndicatorFullWidth="false"
+                app:tabIndicatorGravity="bottom"
+                app:tabMode="scrollable"
+                app:tabSelectedTextColor="?attr/colorPrimary"
+                app:tabTextAppearance="@style/TextAppearance.Material3.LabelLarge" />
 
             <View
                 android:id="@+id/elevation_view"

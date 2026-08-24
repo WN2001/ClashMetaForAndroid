@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- M3 胶囊指示器：圆角填充，选中标签下方显示 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/colorPrimary" />
+    <corners android:radius="3dp" />
+    <size android:height="3dp" />
+</shape>
