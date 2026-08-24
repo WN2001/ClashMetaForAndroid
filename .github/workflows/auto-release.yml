@@ -28,8 +28,8 @@ jobs:
       - name: Read version
         id: ver
         run: |
-          # 从 build.gradle.kts 读取 versionName
-          VERSION=$(grep -m1 'versionName' app/build.gradle.kts | sed -E 's/.*versionName *= *"([^"]+)".*/\1/' || true)
+          # 版本号定义在根 build.gradle.kts 的 defaultConfig（不在 app 模块）
+          VERSION=$(grep -m1 'versionName' build.gradle.kts | sed -E 's/.*versionName *= *"([^"]+)".*/\1/' || true)
           # 兜底：从最近 git tag 推断
           if [ -z "$VERSION" ]; then
             VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//;s/-.*//' || echo "0.0.0")
