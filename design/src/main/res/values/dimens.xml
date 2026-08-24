@@ -49,7 +49,7 @@
     <dimen name="main_logo_size">50dp</dimen>
     <dimen name="main_top_banner_height">90dp</dimen>
 
-    <dimen name="proxy_layout_padding">3dp</dimen>
+    <dimen name="proxy_layout_padding">4dp</dimen>
     <dimen name="proxy_content_padding">15dp</dimen>
     <dimen name="proxy_content_padding_grid3">12dp</dimen>
     <dimen name="proxy_text_margin">10dp</dimen>
@@ -67,8 +67,8 @@
     <dimen name="logcat_padding_vertical">12dp</dimen>
     <dimen name="logcat_padding_horizontal">12dp</dimen>
 
-    <!-- M3 图标容器（40dp 容器 + 24dp 图标，符合 M3 比例） -->
-    <dimen name="icon_container_size">40dp</dimen>
+    <!-- M3 图标容器（36dp 容器 + 24dp 图标，留足内容呼吸空间） -->
+    <dimen name="icon_container_size">36dp</dimen>
     <dimen name="icon_container_radius">12dp</dimen>
 
     <!-- 统一卡片刻度 -->

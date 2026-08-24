@@ -28,7 +28,7 @@
     <color name="color_light_on_secondary_container">#2A2933</color>
     <color name="color_light_surface_variant">#E3E1EC</color>
     <color name="color_light_on_surface_variant">#46464F</color>
-    <color name="color_light_surface_container_high">#EDEAF1</color>
+    <color name="color_light_surface_container_high">#E3E0EC</color>
     <color name="color_light_outline_variant">#C5C5D0</color>
     <!-- 深色 -->
     <color name="color_dark_primary_container">#2A3389</color>

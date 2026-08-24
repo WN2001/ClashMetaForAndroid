@@ -92,13 +92,6 @@ class ProxyView(
                     Path.Direction.CW,
                 )
 
-                paint.setShadowLayer(
-                    state.config.cardRadius,
-                    state.config.cardOffset,
-                    state.config.cardOffset,
-                    state.config.shadow
-                )
-
                 drawPath(path, paint)
 
                 clipPath(path)
