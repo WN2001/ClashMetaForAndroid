@@ -71,7 +71,7 @@
                             android:background="@drawable/bg_icon_container"
                             android:backgroundTint="?attr/colorPrimaryContainer"
                             android:padding="8dp"
-                            android:scaleType="center"
+                            android:scaleType="centerInside"
                             android:src="@drawable/ic_clash"
                             android:tint="?attr/colorOnPrimaryContainer" />
                     </FrameLayout>
