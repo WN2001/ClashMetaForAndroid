@@ -4,7 +4,9 @@ import android.content.Context
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import androidx.recyclerview.widget.RecyclerView
+import com.github.kr328.clash.design.R
 import com.github.kr328.clash.design.model.LogFile
+import com.github.kr328.clash.common.compat.getDrawableCompat
 import com.github.kr328.clash.design.util.format
 import com.github.kr328.clash.design.view.ActionLabel
 
@@ -27,6 +29,7 @@ class LogFileAdapter(
 
         holder.label.text = current.fileName
         holder.label.subtext = current.date.format(context)
+        holder.label.icon = context.getDrawableCompat(R.drawable.ic_outline_article)
         holder.label.setOnClickListener {
             open(current)
         }
