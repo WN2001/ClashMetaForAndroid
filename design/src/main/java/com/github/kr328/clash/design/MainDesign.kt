@@ -2,7 +2,7 @@ package com.github.kr328.clash.design
 
 import android.content.Context
 import android.view.View
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.github.kr328.clash.core.model.TunnelState
 import com.github.kr328.clash.core.util.trafficTotal
 import com.github.kr328.clash.design.databinding.DesignAboutBinding
@@ -72,7 +72,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
                 this.versionName = versionName
             }
 
-            AlertDialog.Builder(context)
+            MaterialAlertDialogBuilder(context)
                 .setView(binding.root)
                 .show()
         }

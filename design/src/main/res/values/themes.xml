@@ -12,7 +12,7 @@
 -->
 <resources>
 
-    <style name="AppBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+    <style name="AppBottomSheetStyle" parent="Widget.Material3.BottomSheet.Modal">
         <item name="android:background">@drawable/bg_bottom_sheet</item>
     </style>
 
