@@ -1,0 +1,98 @@
+name: Upstream Sync
+
+# 每周自动从上游 MetaCubeX/ClashMetaForAndroid 同步，保留本仓库的 UI 改动
+# 无冲突：直接并入 main（自动触发 Build Debug 编译）
+# 有冲突：推到 upstream-sync 分支并创建 PR，附冲突文件清单
+
+on:
+  schedule:
+    # 每周一 UTC 02:00（北京时间周一 10:00）
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/MetaCubeX/ClashMetaForAndroid.git || true
+          git fetch upstream main --depth=1
+
+      - name: Check if upstream has new commits
+        id: check
+        run: |
+          LOCAL=$(git rev-parse HEAD)
+          UPSTREAM=$(git rev-parse upstream/main)
+          echo "local=$LOCAL upstream=$UPSTREAM"
+          if [ "$LOCAL" = "$UPSTREAM" ] || git merge-base --is-ancestor upstream/main HEAD; then
+            echo "upstream already merged into main, skip"
+            echo "has_new=false" >> $GITHUB_OUTPUT
+          else
+            echo "upstream has new commits"
+            echo "has_new=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Attempt merge upstream into main
+        id: merge
+        if: steps.check.outputs.has_new == 'true'
+        continue-on-error: true
+        run: |
+          if git merge upstream/main --no-edit; then
+            echo "merge=ok" >> $GITHUB_OUTPUT
+          else
+            echo "merge=conflict" >> $GITHUB_OUTPUT
+            # 收集冲突文件清单
+            git diff --name-only --diff-filter=U > /tmp/conflicts.txt
+            echo "冲突文件列表："
+            cat /tmp/conflicts.txt
+          fi
+
+      - name: Push to main (no conflict)
+        if: steps.check.outputs.has_new == 'true' && steps.merge.outputs.merge == 'ok'
+        run: |
+          git push origin main
+          echo "::notice::已无冲突合并上游到 main，Build Debug 将自动触发"
+
+      - name: Push to sync branch + create PR (has conflict)
+        if: steps.check.outputs.has_new == 'true' && steps.merge.outputs.merge == 'conflict'
+        run: |
+          BRANCH="upstream-sync"
+          # 放弃本次合并的冲突状态，切到新分支重新合并以便推 PR
+          git merge --abort || true
+          git checkout -b "$BRANCH"
+          git merge upstream/main --no-edit || true
+
+          # 把冲突状态（含冲突标记的文件）原样提交，便于人工 review
+          git add -A
+          git commit -m "sync: 合并上游（含冲突待解决）" --no-verify || true
+
+          git push origin "$BRANCH" --force
+
+          CONFLICTS=$(cat /tmp/conflicts.txt 2>/dev/null | sed 's/^/- /')
+          BODY=$(printf "上游 %s 有新提交，合并时以下文件冲突，需人工解决：\n\n%s\n\n## 提示\n1. 本地 clone 后 \`git checkout upstream-sync\`，解决冲突\n2. 提交并合并到 main\n3. 合并后 Build Debug 自动编译\n\n上游提交：https://github.com/MetaCubeX/ClashMetaForAndroid/commits/main" \
+            "MetaCubeX/ClashMetaForAndroid" "${CONFLICTS:-（无）}")
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "上游同步：有冲突需人工处理" \
+            --body "$BODY" \
+            --label "upstream-sync"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

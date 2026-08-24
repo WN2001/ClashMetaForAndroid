@@ -1,0 +1,113 @@
+name: Auto Release
+
+# Build Debug 成功完成后自动发布所有架构 APK 到 GitHub Release
+# tag = v<版本号>-m3
+
+on:
+  workflow_run:
+    workflows: ["Build Debug"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  release:
+    # 只在 Build Debug 成功时执行；workflow_run 对失败也会触发，需判断 conclusion
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Read version
+        id: ver
+        run: |
+          # 从 build.gradle.kts 读取 versionName
+          VERSION=$(grep -m1 'versionName' app/build.gradle.kts | sed -E 's/.*versionName *= *"([^"]+)".*/\1/' || true)
+          # 兜底：从最近 git tag 推断
+          if [ -z "$VERSION" ]; then
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//;s/-.*//' || echo "0.0.0")
+          fi
+          TAG="v${VERSION}-m3"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "resolved version=$VERSION tag=$TAG"
+
+      - name: Determine build run to download from
+        id: run
+        run: |
+          if [ -n "${{ github.event.workflow_run.id }}" ]; then
+            echo "id=${{ github.event.workflow_run.id }}" >> $GITHUB_OUTPUT
+          else
+            # workflow_dispatch 兜底：取最近一次成功的 Build Debug
+            RID=$(gh run list -R ${{ github.repository }} --workflow="Build Debug" --branch=main --status=success --limit=1 --json databaseId --jq '.[0].databaseId')
+            echo "id=$RID" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download all architecture APKs
+        run: |
+          mkdir -p apks
+          gh run download "${{ steps.run.outputs.id }}" -R ${{ github.repository }} -D apks
+          echo "下载的 artifact："
+          ls -la apks/
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Collect APK files
+        id: apks
+        run: |
+          # 把所有 apk 集中到一层目录（gh run download 会按 artifact 名建子目录）
+          mkdir -p dist
+          find apks -name "*.apk" -exec cp {} dist/ \;
+          ls -la dist/
+
+      - name: Delete existing release (if same tag)
+        run: |
+          if gh release view "${{ steps.ver.outputs.tag }}" -R ${{ github.repository }} >/dev/null 2>&1; then
+            echo "tag ${{ steps.ver.outputs.tag }} 已有 release，删除重建"
+            gh release delete "${{ steps.ver.outputs.tag }}" -R ${{ github.repository }} --yes --cleanup-tag || true
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release with all APKs
+        run: |
+          NOTES="## CMFA ${{ steps.ver.outputs.version }} — M3 现代化版（自动构建）
+
+          基于上游 [MetaCubeX/ClashMetaForAndroid](https://github.com/MetaCubeX/ClashMetaForAndroid) ${{ steps.ver.outputs.version }}，自动同步 + 自动编译。
+
+          ### 包含改动
+          - Material 3 主题迁移 + Android 12+ 动态取色
+          - 全应用彩色图标容器
+          - 卡片圆角统一 16dp、Filled Card 风格
+          - M3 排版/对话框/开关/底部弹窗/转场动画
+          - 代理页 Tab 胶囊指示器
+
+          ### 架构
+          - **arm64-v8a** — 现代手机（推荐）
+          - **armeabi-v7a** — 老设备
+          - **x86_64** — 模拟器/平板
+          - **x86** — 旧模拟器
+          - **universal** — 通用版
+
+          > Debug 签名，包名 \`com.github.metacubex.clash.alpha\`，可与官方版共存。"
+
+          gh release create "${{ steps.ver.outputs.tag }}" \
+            -R ${{ github.repository }} \
+            --target main \
+            --title "CMFA ${{ steps.ver.outputs.version }} — M3 现代化版" \
+            --notes "$NOTES" \
+            dist/*.apk
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        run: |
+          echo "✅ 已发布 Release: ${{ steps.ver.outputs.tag }}"
+          echo "https://github.com/${{ github.repository }}/releases/tag/${{ steps.ver.outputs.tag }}"
