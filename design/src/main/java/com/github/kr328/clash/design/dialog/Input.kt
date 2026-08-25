@@ -63,7 +63,7 @@ suspend fun Context.requestModelTextInput(
         it.invokeOnCancellation {
             // 仅在 Activity 真正销毁时关闭弹窗；协程被意外取消（非 Activity 销毁，如配置变化重建）时保留弹窗
             val activity = run {
-                var c: Context? = context
+                var c: Context? = this@requestModelTextInput
                 while (c is ContextWrapper) {
                     if (c is AppCompatActivity) return@run c
                     c = c.baseContext
