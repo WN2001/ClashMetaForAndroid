@@ -144,6 +144,8 @@ private suspend fun requestModelInputEntry(
             }
         }
 
+        ctx.invokeOnCancellation { dialog.dismiss() }
+
         dialog.show()
     }
 }

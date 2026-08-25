@@ -36,13 +36,16 @@ class LogsDesign(context: Context) : Design<LogsDesign.Request>(context) {
     suspend fun requestDeleteAll(): Boolean {
         return withContext(Dispatchers.Main) {
             suspendCancellableCoroutine { ctx ->
-                MaterialAlertDialogBuilder(context)
+                val dialog = MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.delete_all_logs)
                     .setMessage(R.string.delete_all_logs_warn)
                     .setPositiveButton(R.string.ok) { _, _ -> ctx.resume(true) }
                     .setNegativeButton(R.string.cancel) { _, _ -> }
                     .show()
-                    .setOnDismissListener { if (!ctx.isCompleted) ctx.resume(false) }
+
+                dialog.setOnDismissListener { if (!ctx.isCompleted) ctx.resume(false) }
+
+                ctx.invokeOnCancellation { dialog.dismiss() }
             }
         }
     }
