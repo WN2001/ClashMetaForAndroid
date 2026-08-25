@@ -1,7 +1,9 @@
 package com.github.kr328.clash.design.dialog
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
 import com.github.kr328.clash.design.R
@@ -36,7 +38,7 @@ suspend fun Context.requestModelTextInput(
         val builder = MaterialAlertDialogBuilder(this)
             .setTitle(title)
             .setView(binding.root)
-            .setCancelable(true)
+            .setCancelable(false)
             .setPositiveButton(R.string.ok) { _, _ ->
                 val text = binding.textField.text?.toString() ?: ""
 
@@ -66,8 +68,12 @@ suspend fun Context.requestModelTextInput(
 
         val dialog = builder.create()
 
-        // 防御：仅保留返回键取消，避免某些 OEM ROM（MIUI/EMUI/ColorOS）IME 弹出注入 outside-touch 误触发取消
         dialog.setCanceledOnTouchOutside(false)
+
+        // 拦截系统预测性返回手势/边缘误触的 cancel，防止弹窗被误关
+        dialog.setOnCancelListener {
+            Log.w("CMFA_DIALOG", "Input dialog onCancel (intercepted)")
+        }
 
         it.invokeOnCancellation {
             Log.w("CMFA_DIALOG", "Input coroutine cancelled, dismissing dialog")
