@@ -50,7 +50,11 @@ class PropertiesActivity : BaseActivity<PropertiesDesign>() {
                             }
                         }
                         Event.ServiceRecreated -> {
-                            finish()
+                            // 服务进程重建时不 finish——否则会杀死用户正在编辑的 URL/age 弹窗。
+                            // profile 编辑态在内存，pending 条目在 Room DB（跨进程存活），
+                            // withProfile 捕获 DeadObjectException 后自动重连新服务。
+                            // （:background 首启会误报 ServiceRecreated，是弹窗消失主因）
+                            Unit
                         }
                         else -> Unit
                     }

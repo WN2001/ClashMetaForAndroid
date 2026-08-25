@@ -64,6 +64,9 @@ suspend fun Context.requestModelTextInput(
 
         val dialog = builder.create()
 
+        // 防御：仅保留返回键取消，避免某些 OEM ROM（MIUI/EMUI/ColorOS）IME 弹出注入 outside-touch 误触发取消
+        dialog.setCanceledOnTouchOutside(false)
+
         it.invokeOnCancellation {
             dialog.dismiss()
         }
