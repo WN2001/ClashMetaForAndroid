@@ -63,7 +63,17 @@ internal suspend fun requestEditableListOverlay(
             }
 
             ctx.invokeOnCancellation {
-                dialog.dismiss()
+                val activity = run {
+                    var c: android.content.Context? = context
+                    while (c is android.content.ContextWrapper) {
+                        if (c is androidx.appcompat.app.AppCompatActivity) return@run c
+                        c = c.baseContext
+                    }
+                    null
+                }
+                if (activity == null || activity.isFinishing || activity.isDestroyed) {
+                    dialog.dismiss()
+                }
             }
 
             dialog.show()

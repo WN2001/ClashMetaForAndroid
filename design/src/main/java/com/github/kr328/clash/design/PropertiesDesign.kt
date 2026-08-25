@@ -71,7 +71,20 @@ class PropertiesDesign(context: Context) : Design<PropertiesDesign.Request>(cont
                     .setOnDismissListener { if (!ctx.isCompleted) ctx.resume(false) }
                     .show()
 
-                ctx.invokeOnCancellation { dialog.dismiss() }
+                ctx.invokeOnCancellation {
+                    // 仅在 Activity 真正销毁时关闭，协程被意外取消时保留弹窗
+                    val activity = run {
+                        var c: android.content.Context? = context
+                        while (c is android.content.ContextWrapper) {
+                            if (c is androidx.appcompat.app.AppCompatActivity) return@run c
+                            c = c.baseContext
+                        }
+                        null
+                    }
+                    if (activity == null || activity.isFinishing || activity.isDestroyed) {
+                        dialog.dismiss()
+                    }
+                }
             }
         }
     }

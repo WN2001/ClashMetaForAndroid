@@ -83,16 +83,22 @@ suspend fun Context.requestModelTextInput(
                 binding.textLayout.isErrorEnabled = error != null
 
                 doOnTextChanged { text, _, _, _ ->
-                    if (!validator(text?.toString() ?: "")) {
+                    val valid = try {
+                        validator(text?.toString() ?: "")
+                    } catch (e: Exception) {
+                        // validator（如 native Clash.veritySecretKeys）异常时不冒泡，仅判为无效
+                        false
+                    }
+                    if (!valid) {
                         if (error != null)
                             binding.textLayout.error = error
 
-                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.isEnabled = false
                     } else {
                         if (error != null)
                             binding.textLayout.error = null
 
-                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.isEnabled = true
                     }
                 }
 
