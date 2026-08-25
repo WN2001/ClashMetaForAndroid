@@ -16,11 +16,16 @@
         android:orientation="horizontal"
         android:paddingVertical="@dimen/item_padding_vertical">
 
-        <View
-            android:layout_width="@dimen/item_header_component_size"
-            android:layout_height="@dimen/item_header_component_size"
+        <ImageView
+            android:layout_width="@dimen/icon_container_size"
+            android:layout_height="@dimen/icon_container_size"
             android:layout_marginHorizontal="@dimen/item_header_margin"
-            android:background="@{provider.icon}" />
+            android:background="@drawable/bg_icon_container"
+            android:backgroundTint="?attr/colorPrimaryContainer"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@{provider.icon}"
+            android:tint="?attr/colorOnPrimaryContainer" />
 
         <LinearLayout
             android:layout_width="wrap_content"
