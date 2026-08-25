@@ -70,7 +70,15 @@ suspend fun Context.requestModelTextInput(
 
         dialog.setCanceledOnTouchOutside(false)
 
-        // 拦截系统预测性返回手势/边缘误触的 cancel，防止弹窗被误关
+        // 关键修复：OPPO/ColorOS + 搜狗输入法弹出时，系统 dispatch cancel/back 事件导致 dialog 被 dismiss。
+        // setCancelable(false) 不够——系统直接 dismiss 了 dialog 窗口。
+        // 给 dialog 窗口设 SOFT_INPUT_ADJUST_RESIZE + SOFT_INPUT_STATE_VISIBLE，让窗口正确响应 IME，
+        // 避免系统因窗口冲突而清理 dialog。
+        dialog.window?.setSoftInputMode(
+            android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or
+            android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
+        )
+
         dialog.setOnCancelListener {
             Log.w("CMFA_DIALOG", "Input dialog onCancel (intercepted)")
         }
