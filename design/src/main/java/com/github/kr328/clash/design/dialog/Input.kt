@@ -38,7 +38,7 @@ suspend fun Context.requestModelTextInput(
         val builder = MaterialAlertDialogBuilder(this)
             .setTitle(title)
             .setView(binding.root)
-            .setCancelable(false)
+            .setCancelable(true)
             .setPositiveButton(R.string.ok) { _, _ ->
                 val text = binding.textField.text?.toString() ?: ""
 
@@ -69,19 +69,6 @@ suspend fun Context.requestModelTextInput(
         val dialog = builder.create()
 
         dialog.setCanceledOnTouchOutside(false)
-
-        // 关键修复：OPPO/ColorOS + 搜狗输入法弹出时，系统 dispatch cancel/back 事件导致 dialog 被 dismiss。
-        // setCancelable(false) 不够——系统直接 dismiss 了 dialog 窗口。
-        // 给 dialog 窗口设 SOFT_INPUT_ADJUST_RESIZE + SOFT_INPUT_STATE_VISIBLE，让窗口正确响应 IME，
-        // 避免系统因窗口冲突而清理 dialog。
-        dialog.window?.setSoftInputMode(
-            android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or
-            android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
-        )
-
-        dialog.setOnCancelListener {
-            Log.w("CMFA_DIALOG", "Input dialog onCancel (intercepted)")
-        }
 
         it.invokeOnCancellation {
             Log.w("CMFA_DIALOG", "Input coroutine cancelled, dismissing dialog")
