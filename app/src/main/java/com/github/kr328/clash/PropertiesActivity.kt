@@ -1,5 +1,6 @@
 package com.github.kr328.clash
 
+import android.util.Log
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.common.util.setUUID
 import com.github.kr328.clash.common.util.uuid
@@ -50,6 +51,7 @@ class PropertiesActivity : BaseActivity<PropertiesDesign>() {
                             }
                         }
                         Event.ServiceRecreated -> {
+                            Log.w("CMFA_DIALOG", "PropertiesActivity received ServiceRecreated")
                             // 服务进程重建时不 finish——否则会杀死用户正在编辑的 URL/age 弹窗。
                             // profile 编辑态在内存，pending 条目在 Room DB（跨进程存活），
                             // withProfile 捕获 DeadObjectException 后自动重连新服务。
@@ -77,8 +79,10 @@ class PropertiesActivity : BaseActivity<PropertiesDesign>() {
         design?.apply {
             launch {
                 if (!progressing) {
-                    if (original == profile || requestExitWithoutSaving())
+                    if (original == profile || requestExitWithoutSaving()) {
+                        Log.w("CMFA_DIALOG", "PropertiesActivity finish() from onBackPressed")
                         finish()
+                    }
                 }
             }
         } ?: return super.onBackPressed()
@@ -110,6 +114,7 @@ class PropertiesActivity : BaseActivity<PropertiesDesign>() {
 
                     setResult(RESULT_OK)
 
+                    Log.w("CMFA_DIALOG", "PropertiesActivity finish() from commit")
                     finish()
                 } catch (e: Exception) {
                     showExceptionToast(e)
