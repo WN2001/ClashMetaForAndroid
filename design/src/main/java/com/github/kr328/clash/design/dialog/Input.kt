@@ -1,7 +1,9 @@
 package com.github.kr328.clash.design.dialog
 
 import android.content.Context
+import android.content.ContextWrapper
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import com.github.kr328.clash.design.R
 import com.github.kr328.clash.design.databinding.DialogTextFieldBinding
@@ -59,7 +61,18 @@ suspend fun Context.requestModelTextInput(
         val dialog = builder.create()
 
         it.invokeOnCancellation {
-            dialog.dismiss()
+            // 仅在 Activity 真正销毁时关闭弹窗；协程被意外取消（非 Activity 销毁，如配置变化重建）时保留弹窗
+            val activity = run {
+                var c: Context? = context
+                while (c is ContextWrapper) {
+                    if (c is AppCompatActivity) return@run c
+                    c = c.baseContext
+                }
+                null
+            }
+            if (activity == null || activity.isFinishing || activity.isDestroyed) {
+                dialog.dismiss()
+            }
         }
 
         dialog.setOnShowListener {
