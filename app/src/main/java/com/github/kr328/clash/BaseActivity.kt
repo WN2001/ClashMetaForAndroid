@@ -4,7 +4,6 @@ import android.app.ActivityManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
@@ -117,7 +116,6 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
     }
 
     override fun onDestroy() {
-        Log.w("CMFA_DIALOG", "BaseActivity onDestroy: ${this::class.java.simpleName}, isFinishing=$isFinishing, isDestroyed=$isDestroyed")
         design?.cancel()
         cancel()
         super.onDestroy()
@@ -140,10 +138,8 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        Log.w("CMFA_DIALOG", "onConfigurationChanged: ${this::class.java.simpleName}, uiMode=${newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK}")
 
         if (queryDayNight(newConfig) != dayNight) {
-            Log.w("CMFA_DIALOG", "dayNight changed, recreating all activities")
             ApplicationObserver.createdActivities.forEach {
                 it.recreate()
             }
@@ -176,7 +172,6 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
     }
 
     override fun onServiceRecreated() {
-        Log.w("CMFA_DIALOG", "onServiceRecreated: ${this::class.java.simpleName}")
         events.trySend(Event.ServiceRecreated)
     }
 

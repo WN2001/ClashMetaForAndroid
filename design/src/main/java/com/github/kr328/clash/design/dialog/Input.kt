@@ -1,9 +1,6 @@
 package com.github.kr328.clash.design.dialog
 
 import android.content.Context
-import android.os.Build
-import android.util.Log
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
 import com.github.kr328.clash.design.R
@@ -55,7 +52,6 @@ suspend fun Context.requestModelTextInput(
             }
             .setNegativeButton(R.string.cancel) { _, _ -> }
             .setOnDismissListener { _ ->
-                Log.w("CMFA_DIALOG", "Input dialog onDismiss, isCompleted=${it.isCompleted}")
                 if (!it.isCompleted)
                     it.resume(initial)
             }
@@ -71,7 +67,6 @@ suspend fun Context.requestModelTextInput(
         dialog.setCanceledOnTouchOutside(false)
 
         it.invokeOnCancellation {
-            Log.w("CMFA_DIALOG", "Input coroutine cancelled, dismissing dialog")
             dialog.dismiss()
         }
 
@@ -110,7 +105,6 @@ suspend fun Context.requestModelTextInput(
             }
         }
 
-        Log.w("CMFA_DIALOG", "Input dialog showing, title=$title")
         dialog.show()
     }
 }
