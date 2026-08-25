@@ -41,6 +41,7 @@
         <item name="colorOnPrimaryContainer">@color/color_light_on_primary_container</item>
         <item name="colorSecondaryContainer">@color/color_light_secondary_container</item>
         <item name="colorOnSecondaryContainer">@color/color_light_on_secondary_container</item>
+        <item name="colorSurface">@color/color_light_surface</item>
         <item name="colorSurfaceVariant">@color/color_light_surface_variant</item>
         <item name="colorOnSurfaceVariant">@color/color_light_on_surface_variant</item>
         <item name="colorSurfaceContainerHigh">@color/color_light_surface_container_high</item>
@@ -106,6 +107,7 @@
         <item name="colorOnPrimaryContainer">@color/color_light_on_primary_container</item>
         <item name="colorSecondaryContainer">@color/color_light_secondary_container</item>
         <item name="colorOnSecondaryContainer">@color/color_light_on_secondary_container</item>
+        <item name="colorSurface">@color/color_light_surface</item>
         <item name="colorSurfaceVariant">@color/color_light_surface_variant</item>
         <item name="colorOnSurfaceVariant">@color/color_light_on_surface_variant</item>
         <item name="colorSurfaceContainerHigh">@color/color_light_surface_container_high</item>

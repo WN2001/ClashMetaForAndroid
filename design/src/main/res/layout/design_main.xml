@@ -117,7 +117,7 @@
 
                 <com.github.kr328.clash.design.view.LargeActionLabel
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/main_label_margin_vertical"
                     android:onClick="@{() -> self.request(Request.OpenProviders)}"
                     android:visibility="@{clashRunning &amp;&amp; hasProviders ? View.VISIBLE : View.GONE}"

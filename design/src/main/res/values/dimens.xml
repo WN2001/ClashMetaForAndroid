@@ -57,7 +57,6 @@
     <dimen name="proxy_text_size">12sp</dimen>
     <dimen name="proxy_text_size_grid3">11sp</dimen>
     <dimen name="proxy_card_radius">16dp</dimen>
-    <dimen name="proxy_card_offset">0dp</dimen>
 
     <dimen name="properties_element_margin_vertical">2.5dp</dimen>
 
