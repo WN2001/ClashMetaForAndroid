@@ -1,18 +1,21 @@
 name: Upstream Sync
 
-# 每周自动从上游 MetaCubeX/ClashMetaForAndroid 同步，保留本仓库的 UI 改动
-# 无冲突：直接并入 main（自动触发 Build Debug 编译）
-# 有冲突：推到 upstream-sync 分支并创建 PR，附冲突文件清单
+# 每天自动从上游 MetaCubeX/ClashMetaForAndroid 同步，保留本仓库的 UI 改动
+# 无冲突：并入 main 并显式 dispatch 两条构建流水线（签名版 + debug 版）
+#   ⚠️ GITHUB_TOKEN 的 push 不会触发 on:push 工作流（GitHub 防循环限制），
+#      必须用 workflow_dispatch API 显式触发编译
+# 有冲突：推 upstream-sync 分支并创建 PR，附冲突文件清单
 
 on:
   schedule:
-    # 每周一 UTC 02:00（北京时间周一 10:00）
-    - cron: '0 2 * * 1'
+    # 每天 UTC 02:00（北京时间 10:00）
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   sync:
@@ -32,7 +35,8 @@ jobs:
       - name: Add upstream remote
         run: |
           git remote add upstream https://github.com/MetaCubeX/ClashMetaForAndroid.git || true
-          git fetch upstream main --depth=1
+          # 深度取 100：merge 需要遍历上游历史到 merge-base，太浅会缺对象
+          git fetch upstream main --depth=100
 
       - name: Check if upstream has new commits
         id: check
@@ -63,11 +67,19 @@ jobs:
             cat /tmp/conflicts.txt
           fi
 
-      - name: Push to main (no conflict)
+      - name: Push to main + trigger builds (no conflict)
         if: steps.check.outputs.has_new == 'true' && steps.merge.outputs.merge == 'ok'
         run: |
           git push origin main
-          echo "::notice::已无冲突合并上游到 main，Build Debug 将自动触发"
+          # GITHUB_TOKEN 的 push 不会触发 on:push 工作流（GitHub 防循环限制），
+          # 必须用 workflow_dispatch API 显式触发两条编译流水线：
+          #   build-pre-release → 更新 Prerelease-alpha（签名版）
+          #   build-debug       → 触发 Auto Release 更新 v版本号-m3
+          gh workflow run build-pre-release.yaml --ref main
+          gh workflow run build-debug.yaml --ref main
+          echo "::notice::已同步上游到 main 并触发编译（签名版 + debug 版）"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push to sync branch + create PR (has conflict)
         if: steps.check.outputs.has_new == 'true' && steps.merge.outputs.merge == 'conflict'
