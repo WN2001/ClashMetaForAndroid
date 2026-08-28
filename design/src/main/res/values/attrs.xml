@@ -17,10 +17,12 @@
     <declare-styleable name="LargeActionCard">
         <attr name="text" />
         <attr name="subtext" />
-        <attr name="subtext2" />
         <attr name="icon" />
         <attr name="iconContainer" format="boolean" />
+        <attr name="acrylicCard" format="boolean" />
     </declare-styleable>
+
+    <attr name="colorAcrylicCard" format="color" />
 
     <declare-styleable name="LargeActionLabel">
         <attr name="text" />

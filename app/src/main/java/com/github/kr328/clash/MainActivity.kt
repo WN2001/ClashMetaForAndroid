@@ -108,7 +108,7 @@ class MainActivity : BaseActivity<MainDesign>() {
 
     private suspend fun MainDesign.fetchTraffic() {
         withClash {
-            setTraffic(queryTrafficNow(), queryTrafficTotal())
+            setForwarded(queryTrafficTotal())
         }
     }
 

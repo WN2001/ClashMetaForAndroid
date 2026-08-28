@@ -18,12 +18,6 @@
             name="profileName"
             type="String" />
         <variable
-            name="speedUp"
-            type="String" />
-        <variable
-            name="speedDown"
-            type="String" />
-        <variable
             name="colorClashStarted"
             type="int" />
         <variable
@@ -37,11 +31,21 @@
         <import type="com.github.kr328.clash.design.MainDesign.Request" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingStart="@{self.surface.insets.start}"
-        android:paddingEnd="@{self.surface.insets.end}">
+        android:layout_height="match_parent">
+
+        <!-- 亚克力色斑光晕背景层（铺满全屏，延伸到状态栏/导航栏后面） -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/acrylic_bg_blobs" />
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="@{self.surface.insets.start}"
+            android:paddingEnd="@{self.surface.insets.end}">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -99,8 +103,7 @@
                     app:cardBackgroundColor="@{clashRunning ? colorClashStarted : colorClashStopped}"
                     app:icon="@{clashRunning ? @drawable/ic_outline_check_circle : @drawable/ic_outline_not_interested}"
                     app:iconContainer="false"
-                    app:subtext="@{clashRunning ? @string/format_speed(speedDown, speedUp) : @string/tap_to_start}"
-                    app:subtext2="@{clashRunning ? @string/format_traffic_forwarded(forwarded) : null}"
+                    app:subtext="@{clashRunning ? @string/format_traffic_forwarded(forwarded) : @string/tap_to_start}"
                     app:text="@{clashRunning ? @string/running : @string/stopped}" />
 
                 <com.github.kr328.clash.design.view.LargeActionCard
@@ -109,6 +112,7 @@
                     android:layout_marginVertical="@dimen/main_card_margin_vertical"
                     android:onClick="@{() -> self.request(Request.OpenProxy)}"
                     android:visibility="@{clashRunning ? View.VISIBLE : View.GONE}"
+                    app:acrylicCard="true"
                     app:icon="@drawable/ic_baseline_apps"
                     app:subtext="@{mode}"
                     app:text="@string/proxy" />
@@ -118,6 +122,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/main_card_margin_vertical"
                     android:onClick="@{() -> self.request(Request.OpenProfiles)}"
+                    app:acrylicCard="true"
                     app:icon="@drawable/ic_baseline_view_list"
                     app:subtext="@{profileName != null ? @string/format_profile_activated(profileName) : @string/not_selected}"
                     app:text="@string/profile" />
@@ -125,7 +130,10 @@
                 <com.github.kr328.clash.design.view.LargeActionLabel
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_label_margin_vertical"
+                    android:background="@drawable/acrylic_row_bg"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingHorizontal="@dimen/large_item_header_margin_horizontal"
+                    android:layout_marginVertical="@dimen/main_card_margin_vertical"
                     android:onClick="@{() -> self.request(Request.OpenProviders)}"
                     android:visibility="@{clashRunning &amp;&amp; hasProviders ? View.VISIBLE : View.GONE}"
                     app:icon="@drawable/ic_baseline_swap_vertical_circle"
@@ -134,7 +142,10 @@
                 <com.github.kr328.clash.design.view.LargeActionLabel
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_label_margin_vertical"
+                    android:background="@drawable/acrylic_row_bg"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingHorizontal="@dimen/large_item_header_margin_horizontal"
+                    android:layout_marginVertical="@dimen/main_card_margin_vertical"
                     android:onClick="@{() -> self.request(Request.OpenLogs)}"
                     app:icon="@drawable/ic_baseline_assignment"
                     app:text="@string/logs" />
@@ -142,7 +153,10 @@
                 <com.github.kr328.clash.design.view.LargeActionLabel
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_label_margin_vertical"
+                    android:background="@drawable/acrylic_row_bg"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingHorizontal="@dimen/large_item_header_margin_horizontal"
+                    android:layout_marginVertical="@dimen/main_card_margin_vertical"
                     android:onClick="@{() -> self.request(Request.OpenSettings)}"
                     app:icon="@drawable/ic_baseline_settings"
                     app:text="@string/settings" />
@@ -150,7 +164,10 @@
                 <com.github.kr328.clash.design.view.LargeActionLabel
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_label_margin_vertical"
+                    android:background="@drawable/acrylic_row_bg"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingHorizontal="@dimen/large_item_header_margin_horizontal"
+                    android:layout_marginVertical="@dimen/main_card_margin_vertical"
                     android:onClick="@{() -> self.request(Request.OpenHelp)}"
                     app:icon="@drawable/ic_baseline_help_center"
                     app:text="@string/help" />
@@ -158,11 +175,15 @@
                 <com.github.kr328.clash.design.view.LargeActionLabel
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_label_margin_vertical"
+                    android:background="@drawable/acrylic_row_bg"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingHorizontal="@dimen/large_item_header_margin_horizontal"
+                    android:layout_marginVertical="@dimen/main_card_margin_vertical"
                     android:onClick="@{() -> self.request(Request.OpenAbout)}"
                     app:icon="@drawable/ic_baseline_info"
                     app:text="@string/about" />
             </LinearLayout>
         </ScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </FrameLayout>
 </layout>

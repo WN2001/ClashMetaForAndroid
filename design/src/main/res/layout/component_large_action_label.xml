@@ -38,15 +38,6 @@
                 android:layout_marginTop="@dimen/large_item_text_margin"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
-
-            <TextView
-                android:id="@+id/subtext2_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/large_item_text_margin"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </layout>

@@ -32,14 +32,6 @@ class LargeActionCard @JvmOverloads constructor(
             binding.subtextView.text = value
         }
 
-    var subtext2: CharSequence?
-        get() = binding.subtext2View.text
-        set(value) {
-            binding.subtext2View.text = value
-            binding.subtext2View.visibility =
-                if (value.isNullOrEmpty()) View.GONE else View.VISIBLE
-        }
-
     var icon: Drawable?
         get() = binding.iconView.drawable
         set(value) {
@@ -62,10 +54,11 @@ class LargeActionCard @JvmOverloads constructor(
         ).apply {
             try {
                 val useContainer = getBoolean(R.styleable.LargeActionCard_iconContainer, true)
+                // 亚克力模式：半透明磨砂卡面 + 细描边（色斑背景透出，模拟 Win11 Acrylic）
+                val acrylic = getBoolean(R.styleable.LargeActionCard_acrylicCard, false)
                 icon = getDrawable(R.styleable.LargeActionCard_icon)
                 text = getString(R.styleable.LargeActionCard_text)
                 subtext = getString(R.styleable.LargeActionCard_subtext)
-                subtext2 = getString(R.styleable.LargeActionCard_subtext2)
 
                 // hero 状态卡（iconContainer=false）：背景已是强色，不套容器，图标用 onPrimary
                 if (!useContainer) {
@@ -73,6 +66,14 @@ class LargeActionCard @JvmOverloads constructor(
                     binding.iconView.imageTintList = ColorStateList.valueOf(
                         context.resolveThemedColor(com.google.android.material.R.attr.colorOnPrimary)
                     )
+                }
+
+                if (acrylic) {
+                    setCardBackgroundColor(context.resolveThemedColor(R.attr.colorAcrylicCard))
+                    strokeColor = context.resolveThemedColor(
+                        com.google.android.material.R.attr.colorOutlineVariant
+                    )
+                    strokeWidth = context.getPixels(R.dimen.acrylic_stroke_width)
                 }
             } finally {
                 recycle()
