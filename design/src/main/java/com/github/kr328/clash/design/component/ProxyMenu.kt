@@ -1,120 +1,75 @@
 package com.github.kr328.clash.design.component
 
+import android.app.Dialog
 import android.content.Context
-import android.view.MenuItem
-import android.view.View
-import androidx.appcompat.widget.PopupMenu
+import android.view.ViewGroup
 import com.github.kr328.clash.core.model.ProxySort
 import com.github.kr328.clash.core.model.TunnelState
 import com.github.kr328.clash.design.ProxyDesign
-import com.github.kr328.clash.design.R
+import com.github.kr328.clash.design.databinding.DialogProxyMenuBinding
+import com.github.kr328.clash.design.dialog.AppBottomSheetDialog
 import com.github.kr328.clash.design.store.UiStore
+import com.github.kr328.clash.design.util.layoutInflater
 import kotlinx.coroutines.channels.Channel
 
+/**
+ * 代理页"更多"菜单：Material BottomSheet 实现（原 PopupMenu 弃用）。
+ *
+ * overrideMode: 非 null 时表示从其他入口（如快速切换）打开，模式组当前值
+ */
 class ProxyMenu(
-    context: Context,
-    menuView: View,
-    mode: TunnelState.Mode?,
+    private val context: Context,
+    private val mode: TunnelState.Mode?,
     private val uiStore: UiStore,
     private val requests: Channel<ProxyDesign.Request>,
     private val updateConfig: () -> Unit,
-) : PopupMenu.OnMenuItemClickListener {
-    private val menu = PopupMenu(context, menuView)
-
+) {
     fun show() {
-        menu.show()
+        val dialog = AppBottomSheetDialog(context)
+
+        val binding = DialogProxyMenuBinding
+            .inflate(context.layoutInflater, dialog.window?.decorView as ViewGroup?, false)
+
+        binding.master = this
+        binding.self = dialog
+        binding.mode = mode
+        binding.line = uiStore.proxyLine
+        binding.sort = uiStore.proxySort
+        binding.exclude = uiStore.proxyExcludeNotSelectable
+
+        dialog.setContentView(binding.root)
+        dialog.show()
     }
 
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        item.isChecked = !item.isChecked
+    fun requestFilter(self: Dialog) {
+        uiStore.proxyExcludeNotSelectable = !uiStore.proxyExcludeNotSelectable
 
-        when (item.itemId) {
-            R.id.not_selectable -> {
-                uiStore.proxyExcludeNotSelectable = item.isChecked
+        requests.trySend(ProxyDesign.Request.ReLaunch)
 
-                requests.trySend(ProxyDesign.Request.ReLaunch)
-            }
-            R.id.single -> {
-                uiStore.proxyLine = 1
-
-                updateConfig()
-
-                requests.trySend(ProxyDesign.Request.ReloadAll)
-            }
-            R.id.doubles -> {
-                uiStore.proxyLine = 2
-
-                updateConfig()
-
-                requests.trySend(ProxyDesign.Request.ReloadAll)
-            }
-            R.id.multiple -> {
-                uiStore.proxyLine = 3
-
-                updateConfig()
-
-                requests.trySend(ProxyDesign.Request.ReloadAll)
-            }
-            R.id.default_ -> {
-                uiStore.proxySort = ProxySort.Default
-
-                requests.trySend(ProxyDesign.Request.ReloadAll)
-            }
-            R.id.name -> {
-                uiStore.proxySort = ProxySort.Title
-
-                requests.trySend(ProxyDesign.Request.ReloadAll)
-            }
-            R.id.delay -> {
-                uiStore.proxySort = ProxySort.Delay
-
-                requests.trySend(ProxyDesign.Request.ReloadAll)
-            }
-            R.id.dont_modify -> {
-                requests.trySend(ProxyDesign.Request.PatchMode(null))
-            }
-            R.id.direct_mode -> {
-                requests.trySend(ProxyDesign.Request.PatchMode(TunnelState.Mode.Direct))
-            }
-            R.id.global_mode -> {
-                requests.trySend(ProxyDesign.Request.PatchMode(TunnelState.Mode.Global))
-            }
-            R.id.rule_mode -> {
-                requests.trySend(ProxyDesign.Request.PatchMode(TunnelState.Mode.Rule))
-            }
-            else -> return false
-        }
-
-        return true
+        self.dismiss()
     }
 
-    init {
-        menu.menuInflater.inflate(R.menu.menu_proxy, menu.menu)
+    fun requestLine(line: Int, self: Dialog) {
+        uiStore.proxyLine = line
 
-        menu.menu.apply {
-            findItem(R.id.not_selectable).isChecked = uiStore.proxyExcludeNotSelectable
+        updateConfig()
 
-            when (uiStore.proxyLine){
-                1 -> findItem(R.id.single).isChecked = true
-                2 -> findItem(R.id.doubles).isChecked = true
-                3 -> findItem(R.id.multiple).isChecked = true
-            }
+        requests.trySend(ProxyDesign.Request.ReloadAll)
 
-            when (uiStore.proxySort) {
-                ProxySort.Default -> findItem(R.id.default_).isChecked = true
-                ProxySort.Title -> findItem(R.id.name).isChecked = true
-                ProxySort.Delay -> findItem(R.id.delay).isChecked = true
-            }
+        self.dismiss()
+    }
 
-            when (mode) {
-                null -> findItem(R.id.dont_modify).isChecked = true
-                TunnelState.Mode.Direct -> findItem(R.id.direct_mode).isChecked = true
-                TunnelState.Mode.Global -> findItem(R.id.global_mode).isChecked = true
-                TunnelState.Mode.Rule -> findItem(R.id.rule_mode).isChecked = true
-                else -> {}
-            }
-        }
+    fun requestSort(sort: ProxySort, self: Dialog) {
+        uiStore.proxySort = sort
 
-        menu.setOnMenuItemClickListener(this)
+        requests.trySend(ProxyDesign.Request.ReloadAll)
+
+        self.dismiss()
+    }
+
+    fun requestMode(mode: TunnelState.Mode?, self: Dialog) {
+        requests.trySend(ProxyDesign.Request.PatchMode(mode))
+
+        self.dismiss()
     }
 }

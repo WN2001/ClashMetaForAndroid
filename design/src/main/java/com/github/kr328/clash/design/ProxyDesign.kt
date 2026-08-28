@@ -44,7 +44,7 @@ class ProxyDesign(
     private var config = ProxyViewConfig(context, uiStore.proxyLine)
 
     private val menu: ProxyMenu by lazy {
-        ProxyMenu(context, binding.menuView, overrideMode, uiStore, requests) {
+        ProxyMenu(context, overrideMode, uiStore, requests) {
             config.proxyLine = uiStore.proxyLine
         }
     }
@@ -123,6 +123,12 @@ class ProxyDesign(
                 ) {
                     if (it == currentItem)
                         updateUrlTestButtonStatus()
+                }
+
+                // M3 风格翻页过渡：轻微视差滑动 + 淡入淡出
+                setPageTransformer { page, position ->
+                    page.translationX = -0.12f * position * page.width
+                    page.alpha = 1f - kotlin.math.abs(position) * 0.25f
                 }
 
                 registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

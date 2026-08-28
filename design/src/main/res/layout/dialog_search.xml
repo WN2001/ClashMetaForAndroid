@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="surface"
@@ -34,12 +35,22 @@
                 android:padding="@dimen/toolbar_image_action_padding"
                 android:src="@drawable/ic_baseline_close" />
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/keyword_view"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:hint="@string/keyword"
-                android:singleLine="true" />
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:startIconCheckable="false"
+                app:startIconDrawable="@drawable/ic_baseline_search">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/keyword_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionSearch"
+                    android:singleLine="true" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
         <com.github.kr328.clash.design.view.AppRecyclerView
