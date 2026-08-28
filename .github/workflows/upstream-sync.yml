@@ -67,17 +67,15 @@ jobs:
             cat /tmp/conflicts.txt
           fi
 
-      - name: Push to main + trigger builds (no conflict)
+      - name: Push to main + trigger build (no conflict)
         if: steps.check.outputs.has_new == 'true' && steps.merge.outputs.merge == 'ok'
         run: |
           git push origin main
           # GITHUB_TOKEN 的 push 不会触发 on:push 工作流（GitHub 防循环限制），
-          # 必须用 workflow_dispatch API 显式触发两条编译流水线：
-          #   build-pre-release → 更新 Prerelease-alpha（签名版）
-          #   build-debug       → 触发 Auto Release 更新 v版本号-m3
+          # 必须用 workflow_dispatch API 显式触发唯一编译流水线：
+          #   build-pre-release → 签名构建并更新 Prerelease-alpha
           gh workflow run build-pre-release.yaml --ref main
-          gh workflow run build-debug.yaml --ref main
-          echo "::notice::已同步上游到 main 并触发编译（签名版 + debug 版）"
+          echo "::notice::已同步上游到 main 并触发签名构建"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
