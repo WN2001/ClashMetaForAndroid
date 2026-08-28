@@ -7,21 +7,19 @@
         <variable
             name="self"
             type="android.app.Dialog" />
+        <!-- mode/sort 用 int 索引绑定，避免 DataBinding 解析嵌套 enum -->
+        <variable
+            name="modeIndex"
+            type="int" />
+        <variable
+            name="sortIndex"
+            type="int" />
         <variable
             name="line"
             type="int" />
         <variable
-            name="sort"
-            type="com.github.kr328.clash.core.model.ProxySort" />
-        <variable
-            name="mode"
-            type="com.github.kr328.clash.core.model.TunnelState.Mode" />
-        <variable
             name="exclude"
             type="boolean" />
-
-        <import type="com.github.kr328.clash.core.model.TunnelState" />
-        <import type="com.github.kr328.clash.core.model.ProxySort" />
     </data>
 
     <ScrollView
@@ -75,7 +73,7 @@
                     android:focusable="false" />
             </LinearLayout>
 
-            <!-- 模式 -->
+            <!-- 模式：0=不修改 1=直连 2=全局 3=规则 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -92,7 +90,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
-                android:onClick="@{() -> master.requestMode(null, self)}"
+                android:onClick="@{() -> master.requestMode(0, self)}"
                 android:orientation="horizontal"
                 android:paddingHorizontal="24dp"
                 android:paddingVertical="12dp">
@@ -108,7 +106,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="?attr/colorPrimary"
-                    android:checked="@{mode == null}"
+                    android:checked="@{modeIndex == 0}"
                     android:clickable="false"
                     android:focusable="false" />
             </LinearLayout>
@@ -120,7 +118,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
-                android:onClick="@{() -> master.requestMode(TunnelState.Mode.Direct, self)}"
+                android:onClick="@{() -> master.requestMode(1, self)}"
                 android:orientation="horizontal"
                 android:paddingHorizontal="24dp"
                 android:paddingVertical="12dp">
@@ -136,7 +134,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="?attr/colorPrimary"
-                    android:checked="@{mode == TunnelState.Mode.Direct}"
+                    android:checked="@{modeIndex == 1}"
                     android:clickable="false"
                     android:focusable="false" />
             </LinearLayout>
@@ -148,7 +146,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
-                android:onClick="@{() -> master.requestMode(TunnelState.Mode.Global, self)}"
+                android:onClick="@{() -> master.requestMode(2, self)}"
                 android:orientation="horizontal"
                 android:paddingHorizontal="24dp"
                 android:paddingVertical="12dp">
@@ -164,7 +162,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="?attr/colorPrimary"
-                    android:checked="@{mode == TunnelState.Mode.Global}"
+                    android:checked="@{modeIndex == 2}"
                     android:clickable="false"
                     android:focusable="false" />
             </LinearLayout>
@@ -176,7 +174,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
-                android:onClick="@{() -> master.requestMode(TunnelState.Mode.Rule, self)}"
+                android:onClick="@{() -> master.requestMode(3, self)}"
                 android:orientation="horizontal"
                 android:paddingHorizontal="24dp"
                 android:paddingVertical="12dp">
@@ -192,7 +190,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="?attr/colorPrimary"
-                    android:checked="@{mode == TunnelState.Mode.Rule}"
+                    android:checked="@{modeIndex == 3}"
                     android:clickable="false"
                     android:focusable="false" />
             </LinearLayout>
@@ -291,7 +289,7 @@
                     android:focusable="false" />
             </LinearLayout>
 
-            <!-- 排序 -->
+            <!-- 排序：0=默认 1=名称 2=延迟 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -308,7 +306,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
-                android:onClick="@{() -> master.requestSort(ProxySort.Default, self)}"
+                android:onClick="@{() -> master.requestSort(0, self)}"
                 android:orientation="horizontal"
                 android:paddingHorizontal="24dp"
                 android:paddingVertical="12dp">
@@ -324,7 +322,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="?attr/colorPrimary"
-                    android:checked="@{sort == ProxySort.Default}"
+                    android:checked="@{sortIndex == 0}"
                     android:clickable="false"
                     android:focusable="false" />
             </LinearLayout>
@@ -336,7 +334,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
-                android:onClick="@{() -> master.requestSort(ProxySort.Title, self)}"
+                android:onClick="@{() -> master.requestSort(1, self)}"
                 android:orientation="horizontal"
                 android:paddingHorizontal="24dp"
                 android:paddingVertical="12dp">
@@ -352,7 +350,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="?attr/colorPrimary"
-                    android:checked="@{sort == ProxySort.Title}"
+                    android:checked="@{sortIndex == 1}"
                     android:clickable="false"
                     android:focusable="false" />
             </LinearLayout>
@@ -364,7 +362,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
-                android:onClick="@{() -> master.requestSort(ProxySort.Delay, self)}"
+                android:onClick="@{() -> master.requestSort(2, self)}"
                 android:orientation="horizontal"
                 android:paddingHorizontal="24dp"
                 android:paddingVertical="12dp">
@@ -380,7 +378,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="?attr/colorPrimary"
-                    android:checked="@{sort == ProxySort.Delay}"
+                    android:checked="@{sortIndex == 2}"
                     android:clickable="false"
                     android:focusable="false" />
             </LinearLayout>
