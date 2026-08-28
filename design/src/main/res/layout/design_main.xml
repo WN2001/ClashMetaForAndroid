@@ -18,6 +18,12 @@
             name="profileName"
             type="String" />
         <variable
+            name="speedUp"
+            type="String" />
+        <variable
+            name="speedDown"
+            type="String" />
+        <variable
             name="colorClashStarted"
             type="int" />
         <variable
@@ -93,7 +99,8 @@
                     app:cardBackgroundColor="@{clashRunning ? colorClashStarted : colorClashStopped}"
                     app:icon="@{clashRunning ? @drawable/ic_outline_check_circle : @drawable/ic_outline_not_interested}"
                     app:iconContainer="false"
-                    app:subtext="@{clashRunning ? @string/format_traffic_forwarded(forwarded) : @string/tap_to_start}"
+                    app:subtext="@{clashRunning ? @string/format_speed(speedDown, speedUp) : @string/tap_to_start}"
+                    app:subtext2="@{clashRunning ? @string/format_traffic_forwarded(forwarded) : null}"
                     app:text="@{clashRunning ? @string/running : @string/stopped}" />
 
                 <com.github.kr328.clash.design.view.LargeActionCard

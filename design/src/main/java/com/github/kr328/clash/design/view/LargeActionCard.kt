@@ -32,6 +32,14 @@ class LargeActionCard @JvmOverloads constructor(
             binding.subtextView.text = value
         }
 
+    var subtext2: CharSequence?
+        get() = binding.subtext2View.text
+        set(value) {
+            binding.subtext2View.text = value
+            binding.subtext2View.visibility =
+                if (value.isNullOrEmpty()) View.GONE else View.VISIBLE
+        }
+
     var icon: Drawable?
         get() = binding.iconView.drawable
         set(value) {
@@ -57,6 +65,7 @@ class LargeActionCard @JvmOverloads constructor(
                 icon = getDrawable(R.styleable.LargeActionCard_icon)
                 text = getString(R.styleable.LargeActionCard_text)
                 subtext = getString(R.styleable.LargeActionCard_subtext)
+                subtext2 = getString(R.styleable.LargeActionCard_subtext2)
 
                 // hero 状态卡（iconContainer=false）：背景已是强色，不套容器，图标用 onPrimary
                 if (!useContainer) {

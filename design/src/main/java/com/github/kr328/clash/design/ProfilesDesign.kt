@@ -75,6 +75,14 @@ class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context)
         binding.mainList.recyclerList.also {
             it.bindAppBarElevation(binding.activityBarLayout)
             it.applyLinearAdapter(context, adapter)
+
+            // 列表增删改动画调优：避免刷新订阅时整卡淡入淡出闪烁，变更走 crossfade 快速过渡
+            it.itemAnimator?.apply {
+                addDuration = 220
+                removeDuration = 220
+                moveDuration = 200
+                changeDuration = 150
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import android.view.MotionEvent
 import android.view.View
 import com.github.kr328.clash.common.compat.getDrawableCompat
 import com.github.kr328.clash.design.store.UiStore
@@ -15,6 +16,21 @@ class ProxyView(
 
     init {
         background = context.getDrawableCompat(config.clickableBackground)
+
+        // 按下轻微缩放反馈：按下 0.96，松开回弹（不消费事件，保持 ripple 与点击）
+        setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN ->
+                    view.animate().scaleX(0.96f).scaleY(0.96f)
+                        .setDuration(80)
+                        .start()
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL ->
+                    view.animate().scaleX(1f).scaleY(1f)
+                        .setDuration(160)
+                        .start()
+            }
+            false
+        }
     }
 
     var state: ProxyViewState? = null
