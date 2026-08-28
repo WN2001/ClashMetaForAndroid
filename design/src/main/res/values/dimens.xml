@@ -35,7 +35,6 @@
     <dimen name="item_midden_margin">10dp</dimen>
 
     <dimen name="large_action_card_radius">16dp</dimen>
-    <dimen name="acrylic_stroke_width">1dp</dimen>
     <dimen name="large_action_card_elevation">2dp</dimen>
     <dimen name="large_action_card_min_height">85dp</dimen>
 

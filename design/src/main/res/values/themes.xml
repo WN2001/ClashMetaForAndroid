@@ -177,8 +177,6 @@
         <item name="colorOnSurfaceVariant">@color/color_light_on_surface_variant</item>
         <item name="colorSurfaceContainerHigh">@color/color_light_surface_container_high</item>
         <item name="colorOutlineVariant">@color/color_light_outline_variant</item>
-        <!-- 亚克力磨砂卡面：90% 白，色斑光晕隐约透出 -->
-        <item name="colorAcrylicCard">#E6FFFFFF</item>
         <item name="colorPrimaryDark">?attr/colorPrimary</item>
         <item name="colorSecondary">?attr/colorPrimary</item>
         <item name="colorOnSecondary">?attr/colorOnPrimary</item>
@@ -208,8 +206,6 @@
         <item name="colorOnSurfaceVariant">@color/color_dark_on_surface_variant</item>
         <item name="colorSurfaceContainerHigh">@color/color_dark_surface_container_high</item>
         <item name="colorOutlineVariant">@color/color_dark_outline_variant</item>
-        <!-- 亚克力磨砂卡面：85% 深灰，深色下呈微光玻璃质感 -->
-        <item name="colorAcrylicCard">#DA25242E</item>
         <item name="colorPrimaryDark">?attr/colorPrimary</item>
         <item name="colorSecondary">?attr/colorPrimary</item>
         <item name="colorOnSecondary">?attr/colorOnPrimary</item>

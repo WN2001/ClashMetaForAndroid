@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 主页行级条目的亚克力磨砂底：半透明卡面 + 细描边，与 LargeActionCard(acrylicCard) 观感一致 -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="?attr/colorAcrylicCard" />
-    <corners android:radius="@dimen/large_action_card_radius" />
-    <stroke
-        android:width="@dimen/acrylic_stroke_width"
-        android:color="?attr/colorOutlineVariant" />
-</shape>
