@@ -18,9 +18,17 @@ import com.github.kr328.clash.design.util.resolveThemedResourceId
 import com.github.kr328.clash.design.util.setOnInsertsChangedListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.color.DynamicColors
+
+private fun Dialog.applySystemPalette() {
+    val dynamicContext = DynamicColors.wrapContextIfAvailable(context)
+    if (dynamicContext !== context) context.theme.setTo(dynamicContext.theme)
+}
 
 class AppBottomSheetDialog(context: Context) : BottomSheetDialog(context) {
     private var insets: Insets = Insets.EMPTY
+
+    init { applySystemPalette() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +81,8 @@ class FullScreenDialog(
     context: Context
 ) : Dialog(context, context.resolveThemedResourceId(R.attr.fullScreenDialogTheme)) {
     val surface = Surface()
+
+    init { applySystemPalette() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

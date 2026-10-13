@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.core.view.children
 import com.github.kr328.clash.design.component.ProxyPageFactory
+import com.github.kr328.clash.design.dialog.AppBottomSheetDialog
+import com.github.kr328.clash.design.dialog.FullScreenDialog
+import com.google.android.material.color.DynamicColors
+import org.robolectric.shadows.ShadowBuild
 import com.github.kr328.clash.design.adapter.ProxyAdapter
 import com.github.kr328.clash.design.adapter.ProxyPageAdapter
 import com.github.kr328.clash.core.model.Proxy
@@ -49,6 +53,22 @@ import org.robolectric.annotation.GraphicsMode
 class DashboardUiTest {
     @Before fun setUp() { Dispatchers.setMain(UnconfinedTestDispatcher()) }
     @After fun tearDown() { Dispatchers.resetMain() }
+
+    @Test @Config(sdk = [31]) @GraphicsMode(GraphicsMode.Mode.LEGACY)
+    fun dialogsAndWindowFollowSystemDynamicPalette() {
+        ShadowBuild.setManufacturer("Google")
+        for (dark in listOf(false, true)) {
+            val dynamic = DynamicColors.wrapContextIfAvailable(context(dark))
+            val primary = dynamic.resolveThemedColor(com.google.android.material.R.attr.colorPrimary)
+            val background = dynamic.resolveThemedColor(android.R.attr.colorBackground)
+            assertEquals(background, dynamic.resolveThemedColor(android.R.attr.windowBackground))
+            for (dialog in listOf(AppBottomSheetDialog(dynamic), FullScreenDialog(dynamic))) {
+                assertEquals(primary, dialog.context.resolveThemedColor(com.google.android.material.R.attr.colorPrimary))
+                assertEquals(background, dialog.context.resolveThemedColor(android.R.attr.colorBackground))
+                dialog.dismiss()
+            }
+        }
+    }
 
     private fun context(dark: Boolean = false): Context = ContextThemeWrapper(
         RuntimeEnvironment.getApplication(), if (dark) R.style.AppThemeDark else R.style.AppThemeLight,
