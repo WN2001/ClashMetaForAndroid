@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="color_theme_seed">#D8C0C3</color>
     <color name="color_dark_on_primary">#4C2532</color>
     <color name="color_clash_light">#825260</color>
     <color name="color_clash_dark">#F5B5C7</color>
