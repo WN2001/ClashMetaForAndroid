@@ -263,4 +263,13 @@
     <string name="override_destination">Override Destination</string>
     <string name="import_from_qr_no_permission">相機權限受限，請前往設定開啟。</string>
     <string name="import_from_qr_exception">發生系統未知異常，操作失敗。</string>
+    <string name="dashboard_overview">概覽</string>
+    <string name="dashboard_connection">連線狀態</string>
+    <string name="dashboard_network_speed">即時速率</string>
+    <string name="dashboard_download">↓ 下載</string>
+    <string name="dashboard_upload">↑ 上傳</string>
+    <string name="dashboard_tools">工具與設定</string>
+    <string name="tap_to_stop">點擊停止</string>
+    <string name="format_traffic_speed">%s/秒</string>
+    <string name="proxy_delay_timeout">逾時</string>
 </resources>

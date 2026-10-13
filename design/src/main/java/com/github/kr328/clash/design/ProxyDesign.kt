@@ -18,6 +18,7 @@ import com.github.kr328.clash.design.util.applyFrom
 import com.github.kr328.clash.design.util.layoutInflater
 import com.github.kr328.clash.design.util.resolveThemedColor
 import com.github.kr328.clash.design.util.root
+import com.github.kr328.clash.design.util.animationsEnabled
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -125,10 +126,10 @@ class ProxyDesign(
                         updateUrlTestButtonStatus()
                 }
 
-                // M3 风格翻页过渡：轻微视差滑动 + 淡入淡出
-                setPageTransformer { page, position ->
-                    page.translationX = -0.12f * position * page.width
-                    page.alpha = 1f - kotlin.math.abs(position) * 0.25f
+                if (context.animationsEnabled()) {
+                    setPageTransformer { page, position ->
+                        page.translationX = -0.04f * position * page.width
+                    }
                 }
 
                 registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

@@ -374,4 +374,13 @@
     <string name="shortcut_start_long">Start Clash service</string>
     <string name="shortcut_stop_short">Stop Clash</string>
     <string name="shortcut_stop_long">Stop Clash service</string>
+    <string name="dashboard_overview">Overview</string>
+    <string name="dashboard_connection">Connection</string>
+    <string name="dashboard_network_speed">Network speed</string>
+    <string name="dashboard_download">↓ Download</string>
+    <string name="dashboard_upload">↑ Upload</string>
+    <string name="dashboard_tools">Tools &amp; settings</string>
+    <string name="tap_to_stop">Tap to stop</string>
+    <string name="format_traffic_speed">%s/s</string>
+    <string name="proxy_delay_timeout">Timeout</string>
 </resources>

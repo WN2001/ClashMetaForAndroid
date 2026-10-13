@@ -34,8 +34,14 @@ class ProxyAdapter(
             isFocusable = isSelector
             isClickable = isSelector
 
-            current.update(true)
+            isSelected = current.selected
+            contentDescription = "${current.title}, ${current.subtitle}, ${current.delayText}"
         }
+    }
+
+    override fun onViewRecycled(holder: Holder) {
+        holder.view.state = null
+        super.onViewRecycled(holder)
     }
 
     override fun getItemCount(): Int {

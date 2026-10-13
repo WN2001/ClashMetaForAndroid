@@ -54,8 +54,9 @@
     <dimen name="proxy_content_padding_grid3">12dp</dimen>
     <dimen name="proxy_text_margin">10dp</dimen>
     <dimen name="proxy_text_margin_grid3">5dp</dimen>
-    <dimen name="proxy_text_size">12sp</dimen>
-    <dimen name="proxy_text_size_grid3">11sp</dimen>
+    <dimen name="proxy_text_size">14sp</dimen>
+    <dimen name="proxy_text_size_grid3">12sp</dimen>
+    <dimen name="proxy_subtitle_size">11sp</dimen>
     <dimen name="proxy_card_radius">16dp</dimen>
 
     <dimen name="properties_element_margin_vertical">2.5dp</dimen>

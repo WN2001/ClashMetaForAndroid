@@ -79,7 +79,7 @@ class MainActivity : BaseActivity<MainDesign>() {
                             design.showAbout(queryAppVersionName())
                     }
                 }
-                if (clashRunning) {
+                if (clashRunning && activityStarted) {
                     ticker.onReceive {
                         design.fetchTraffic()
                     }
@@ -107,9 +107,8 @@ class MainActivity : BaseActivity<MainDesign>() {
     }
 
     private suspend fun MainDesign.fetchTraffic() {
-        withClash {
-            setForwarded(queryTrafficTotal())
-        }
+        val traffic = withClash { queryTrafficNow() to queryTrafficTotal() }
+        setTraffic(traffic.first, traffic.second)
     }
 
     private suspend fun MainDesign.startClash() {

@@ -42,4 +42,8 @@
 
     <!-- 错误色 -->
     <color name="color_error">#FFB00020</color>
+    <color name="proxy_delay_fast">#176B45</color>
+    <color name="proxy_delay_slow">#865200</color>
+    <color name="proxy_delay_fast_dark">#88D8AE</color>
+    <color name="proxy_delay_slow_dark">#F2C078</color>
 </resources>
