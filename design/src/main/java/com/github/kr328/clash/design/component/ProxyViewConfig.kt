@@ -11,10 +11,10 @@ import com.google.android.material.R as MaterialR
 
 class ProxyViewConfig(val context: Context, var proxyLine: Int) {
     val clickableBackground = context.resolveThemedResourceId(android.R.attr.selectableItemBackground)
-    val selectedControl = context.resolveThemedColor(MaterialR.attr.colorOnPrimaryContainer)
-    val selectedBackground = context.resolveThemedColor(MaterialR.attr.colorPrimaryContainer)
+    val selectedControl = context.resolveThemedColor(MaterialR.attr.colorOnSecondaryContainer)
+    val selectedBackground = context.resolveThemedColor(MaterialR.attr.colorSecondaryContainer)
     val unselectedControl = context.resolveThemedColor(MaterialR.attr.colorOnSurface)
-    val unselectedBackground = context.resolveThemedColor(MaterialR.attr.colorSurfaceContainerLow)
+    val unselectedBackground = context.resolveThemedColor(MaterialR.attr.colorSurfaceContainer)
     val subtitleColor = context.resolveThemedColor(MaterialR.attr.colorOnSurfaceVariant)
     val outlineColor = context.resolveThemedColor(MaterialR.attr.colorOutlineVariant)
     val primaryColor = context.resolveThemedColor(MaterialR.attr.colorPrimary)

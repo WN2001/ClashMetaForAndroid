@@ -2,6 +2,7 @@ package com.github.kr328.clash.design.component
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.children
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.design.view.VerticalScrollableHost
@@ -32,22 +33,13 @@ class ProxyPageFactory(private val config: ProxyViewConfig) {
         root.addView(recyclerView)
 
         recyclerView.apply {
-            layoutManager = GridLayoutManager(config.context, 6).apply {
-                spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int {
-                        return when (config.proxyLine) {
-                            2 -> 3
-                            3 -> 2
-                            else -> 6
-                        }
-                    }
-                }
-            }
+            layoutManager = GridLayoutManager(config.context, config.proxyLine.coerceIn(1, 3))
 
             setRecycledViewPool(childrenPool)
             setHasFixedSize(true)
             itemAnimator = null
             clipToPadding = false
+            setPadding((8 * config.density).toInt(), 0, (8 * config.density).toInt(), 0)
         }
 
         return Holder(recyclerView, root).apply {
@@ -57,5 +49,17 @@ class ProxyPageFactory(private val config: ProxyViewConfig) {
 
     fun fromRoot(root: View): Holder {
         return root.tag!! as Holder
+    }
+
+    fun updateColumns(recyclerView: RecyclerView) {
+        val layout = recyclerView.layoutManager as GridLayoutManager
+        val anchor = layout.findFirstVisibleItemPosition()
+        val offset = layout.findViewByPosition(anchor)?.top?.minus(recyclerView.paddingTop) ?: 0
+        layout.spanCount = config.proxyLine
+        layout.spanSizeLookup.invalidateSpanIndexCache()
+        layout.spanSizeLookup.invalidateSpanGroupIndexCache()
+        recyclerView.children.forEach { (it as? ProxyView)?.refreshLayout() }
+        if (anchor >= 0) layout.scrollToPositionWithOffset(anchor, offset)
+        recyclerView.requestLayout()
     }
 }

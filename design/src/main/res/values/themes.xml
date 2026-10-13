@@ -1,22 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-
-  改动说明（相比原版）：
-  1. AppThemeLightBase 新增 colorSurface（原版浅色模式缺失，导致卡片与背景无区分度）
-  2. AppThemeLight 新增 windowLightNavigationBar（原版缺失，浅色模式透明导航栏上白色图标不可见）
-  3. AppThemeLight 的 statusBarColor / navigationBarColor 改为 transparent（沉浸式）
-  4. AppThemeLight 新增 windowLightStatusBar（浅色模式状态栏图标深色可见）
-
-  其余所有 style 保持原版不变。
-
--->
 <resources>
 
     <style name="AppBottomSheetStyle" parent="Widget.Material3.BottomSheet.Modal">
         <item name="android:background">@drawable/bg_bottom_sheet</item>
     </style>
-
-    <!-- Activity 转场动画：Material 风格柔和过渡（淡入+轻微位移/缩放） -->
     <style name="AppActivityAnimation">
         <item name="android:activityOpenEnterAnimation">@anim/activity_open_enter</item>
         <item name="android:activityOpenExitAnimation">@anim/activity_open_exit</item>
@@ -42,6 +29,12 @@
         <item name="colorSecondaryContainer">@color/color_light_secondary_container</item>
         <item name="colorOnSecondaryContainer">@color/color_light_on_secondary_container</item>
         <item name="colorSurface">@color/color_light_surface</item>
+        <item name="colorOnSurface">@color/color_light_on_surface</item>
+        <item name="colorSurfaceContainerLow">@color/color_light_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/color_light_surface_container</item>
+        <item name="colorTertiary">@color/color_light_tertiary</item>
+        <item name="colorOutline">@color/color_light_outline_variant</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="colorSurfaceVariant">@color/color_light_surface_variant</item>
         <item name="colorOnSurfaceVariant">@color/color_light_on_surface_variant</item>
         <item name="colorSurfaceContainerHigh">@color/color_light_surface_container_high</item>
@@ -63,8 +56,14 @@
         <item name="paddingBottomSystemWindowInsets">false</item>
         <item name="paddingLeftSystemWindowInsets">false</item>
         <item name="colorPrimary">@color/color_clash_dark</item>
-        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorOnPrimary">@color/color_dark_on_primary</item>
         <item name="colorSurface">@color/color_dark_surface</item>
+        <item name="colorOnSurface">@color/color_dark_on_surface</item>
+        <item name="colorSurfaceContainerLow">@color/color_dark_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/color_dark_surface_container</item>
+        <item name="colorTertiary">@color/color_dark_tertiary</item>
+        <item name="colorOutline">@color/color_dark_outline_variant</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="colorControlDisabled">@color/color_dark_control_disabled</item>
         <item name="colorPrimaryContainer">@color/color_dark_primary_container</item>
         <item name="colorOnPrimaryContainer">@color/color_dark_on_primary_container</item>
@@ -108,6 +107,12 @@
         <item name="colorSecondaryContainer">@color/color_light_secondary_container</item>
         <item name="colorOnSecondaryContainer">@color/color_light_on_secondary_container</item>
         <item name="colorSurface">@color/color_light_surface</item>
+        <item name="colorOnSurface">@color/color_light_on_surface</item>
+        <item name="colorSurfaceContainerLow">@color/color_light_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/color_light_surface_container</item>
+        <item name="colorTertiary">@color/color_light_tertiary</item>
+        <item name="colorOutline">@color/color_light_outline_variant</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="colorSurfaceVariant">@color/color_light_surface_variant</item>
         <item name="colorOnSurfaceVariant">@color/color_light_on_surface_variant</item>
         <item name="colorSurfaceContainerHigh">@color/color_light_surface_container_high</item>
@@ -126,8 +131,14 @@
         <item name="paddingBottomSystemWindowInsets">false</item>
         <item name="paddingLeftSystemWindowInsets">false</item>
         <item name="colorPrimary">@color/color_clash_dark</item>
-        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorOnPrimary">@color/color_dark_on_primary</item>
         <item name="colorSurface">@color/color_dark_surface</item>
+        <item name="colorOnSurface">@color/color_dark_on_surface</item>
+        <item name="colorSurfaceContainerLow">@color/color_dark_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/color_dark_surface_container</item>
+        <item name="colorTertiary">@color/color_dark_tertiary</item>
+        <item name="colorOutline">@color/color_dark_outline_variant</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="colorControlDisabled">@color/color_dark_control_disabled</item>
         <item name="colorPrimaryContainer">@color/color_dark_primary_container</item>
         <item name="colorOnPrimaryContainer">@color/color_dark_on_primary_container</item>
@@ -155,8 +166,6 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
-
-    <!-- ========== 浅色主题基类 ========== -->
     <style name="AppThemeLightBase" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:windowBackground">@color/color_light_background</item>
         <item name="android:ambientShadowAlpha">0.08</item>
@@ -164,8 +173,13 @@
         <item name="android:windowAnimationStyle">@style/AppActivityAnimation</item>
         <item name="colorPrimary">@color/color_clash_light</item>
         <item name="colorOnPrimary">@android:color/white</item>
-        <!-- 新增：浅色模式 colorSurface，让卡片有纯白背景，与 #FBF8FF 微紫白背景形成层次 -->
         <item name="colorSurface">@color/color_light_surface</item>
+        <item name="colorOnSurface">@color/color_light_on_surface</item>
+        <item name="colorSurfaceContainerLow">@color/color_light_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/color_light_surface_container</item>
+        <item name="colorTertiary">@color/color_light_tertiary</item>
+        <item name="colorOutline">@color/color_light_outline_variant</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="colorControlNormal">@android:color/black</item>
         <item name="colorClashStopped">@color/color_light_clash_stopped</item>
         <item name="colorControlDisabled">@color/color_light_control_disabled</item>
@@ -186,16 +200,20 @@
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogLight</item>
         <item name="fullScreenDialogTheme">@style/AppFullScreenDialogLight</item>
     </style>
-
-    <!-- ========== 深色主题基类 ========== -->
     <style name="AppThemeDarkBase" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowBackground">@color/color_dark_background</item>
         <item name="android:ambientShadowAlpha">0.08</item>
         <item name="android:spotShadowAlpha">0.08</item>
         <item name="android:windowAnimationStyle">@style/AppActivityAnimation</item>
         <item name="colorPrimary">@color/color_clash_dark</item>
-        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorOnPrimary">@color/color_dark_on_primary</item>
         <item name="colorSurface">@color/color_dark_surface</item>
+        <item name="colorOnSurface">@color/color_dark_on_surface</item>
+        <item name="colorSurfaceContainerLow">@color/color_dark_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/color_dark_surface_container</item>
+        <item name="colorTertiary">@color/color_dark_tertiary</item>
+        <item name="colorOutline">@color/color_dark_outline_variant</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="colorControlNormal">@android:color/white</item>
         <item name="colorControlDisabled">@color/color_dark_control_disabled</item>
         <item name="colorPrimaryContainer">@color/color_dark_primary_container</item>
@@ -216,17 +234,12 @@
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogDark</item>
         <item name="fullScreenDialogTheme">@style/AppFullScreenDialogDark</item>
     </style>
-
-    <!-- ========== 最终浅色主题（Activity 使用） ========== -->
     <style name="AppThemeLight" parent="AppThemeLightBase">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
-        <!-- 新增：浅色模式导航栏图标用深色，否则透明导航栏上白色图标不可见 -->
         <item name="android:windowLightNavigationBar">true</item>
     </style>
-
-    <!-- ========== 最终深色主题（Activity 使用） ========== -->
     <style name="AppThemeDark" parent="AppThemeDarkBase">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>

@@ -18,7 +18,6 @@ import com.github.kr328.clash.design.util.applyFrom
 import com.github.kr328.clash.design.util.layoutInflater
 import com.github.kr328.clash.design.util.resolveThemedColor
 import com.github.kr328.clash.design.util.root
-import com.github.kr328.clash.design.util.animationsEnabled
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -46,7 +45,7 @@ class ProxyDesign(
 
     private val menu: ProxyMenu by lazy {
         ProxyMenu(context, overrideMode, uiStore, requests) {
-            config.proxyLine = uiStore.proxyLine
+            adapter.updateColumns(uiStore.proxyLine)
         }
     }
 
@@ -126,11 +125,6 @@ class ProxyDesign(
                         updateUrlTestButtonStatus()
                 }
 
-                if (context.animationsEnabled()) {
-                    setPageTransformer { page, position ->
-                        page.translationX = -0.04f * position * page.width
-                    }
-                }
 
                 registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                     override fun onPageScrollStateChanged(state: Int) {

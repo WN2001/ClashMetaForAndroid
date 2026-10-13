@@ -32,6 +32,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import com.github.kr328.clash.design.R
 import com.google.android.material.color.DynamicColors
+import com.google.android.material.color.DynamicColorsOptions
 
 abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
     CoroutineScope by MainScope(),
@@ -220,7 +221,8 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
 
         this.dayNight = dayNight
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            DynamicColors.applyToActivityIfAvailable(this)
+            DynamicColors.applyToActivityIfAvailable(this, DynamicColorsOptions.Builder()
+                .setContentBasedSource(resources.getColor(R.color.color_theme_seed, theme)).build())
         }
     }
 

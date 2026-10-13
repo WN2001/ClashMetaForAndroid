@@ -68,11 +68,9 @@ class ProxyMenu(
     }
 
     fun requestLine(line: Int, self: Dialog) {
-        uiStore.proxyLine = line
+        uiStore.proxyLine = line.coerceIn(1, 3)
 
         updateConfig()
-
-        requests.trySend(ProxyDesign.Request.ReloadAll)
 
         self.dismiss()
     }
