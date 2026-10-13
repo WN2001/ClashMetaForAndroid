@@ -44,7 +44,8 @@
         <item name="colorOnSecondary">?attr/colorOnPrimary</item>
         <item name="colorControlActivated">?attr/colorPrimary</item>
         <item name="android:textColor">?attr/colorControlNormal</item>
-        <item name="android:windowBackground">@color/color_light_background</item>
+        <item name="android:colorBackground">@color/color_light_background</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
     </style>
 
     <style name="AppFullScreenDialogDarkBase" parent="Theme.Material3.Dark.Dialog">
@@ -73,7 +74,8 @@
         <item name="colorOnSurfaceVariant">@color/color_dark_on_surface_variant</item>
         <item name="colorSurfaceContainerHigh">@color/color_dark_surface_container_high</item>
         <item name="colorOutlineVariant">@color/color_dark_outline_variant</item>
-        <item name="android:windowBackground">@color/color_dark_background</item>
+        <item name="android:colorBackground">@color/color_dark_background</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
         <item name="colorPrimaryDark">?attr/colorPrimary</item>
         <item name="colorSecondary">?attr/colorPrimary</item>
         <item name="colorOnSecondary">?attr/colorOnPrimary</item>
@@ -167,7 +169,8 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
     <style name="AppThemeLightBase" parent="Theme.Material3.Light.NoActionBar">
-        <item name="android:windowBackground">@color/color_light_background</item>
+        <item name="android:colorBackground">@color/color_light_background</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
         <item name="android:ambientShadowAlpha">0.08</item>
         <item name="android:spotShadowAlpha">0.08</item>
         <item name="android:windowAnimationStyle">@style/AppActivityAnimation</item>
@@ -201,7 +204,8 @@
         <item name="fullScreenDialogTheme">@style/AppFullScreenDialogLight</item>
     </style>
     <style name="AppThemeDarkBase" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="android:windowBackground">@color/color_dark_background</item>
+        <item name="android:colorBackground">@color/color_dark_background</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
         <item name="android:ambientShadowAlpha">0.08</item>
         <item name="android:spotShadowAlpha">0.08</item>
         <item name="android:windowAnimationStyle">@style/AppActivityAnimation</item>
