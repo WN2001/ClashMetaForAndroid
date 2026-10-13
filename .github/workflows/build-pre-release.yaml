@@ -23,8 +23,18 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ github.sha }}
+          # CMake 用子模块远端分支生成版本号，必须保留完整分支历史。
+          fetch-depth: 0
           submodules: recursive
           persist-credentials: false
+
+      - name: Verify native version metadata
+        run: |
+          branches=$(git -C core/src/foss/golang/clash branch -r --contains HEAD)
+          if [ -z "$branches" ]; then
+            echo "::error::CMake requires a remote branch containing the pinned core commit; check full submodule history."
+            exit 1
+          fi
 
       - name: Validate signing configuration
         env:
