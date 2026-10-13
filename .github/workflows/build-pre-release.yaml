@@ -8,15 +8,34 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: cmfa-prerelease
+  # 发布中途取消会留下不完整的附件；新构建排队等待。
+  cancel-in-progress: false
+
 jobs:
   BuildPreRelease:
-    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
-      
-      - name: Checkout submodules
-        run: git submodule update --init --recursive --force
+        with:
+          ref: ${{ github.sha }}
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Validate signing configuration
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          : "${SIGNING_STORE_PASSWORD:?Missing SIGNING_STORE_PASSWORD}"
+          : "${SIGNING_KEY_ALIAS:?Missing SIGNING_KEY_ALIAS}"
+          : "${SIGNING_KEY_PASSWORD:?Missing SIGNING_KEY_PASSWORD}"
+          test -s release.keystore
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -32,25 +51,28 @@ jobs:
         with:
           go-download-base-url: 'https://github.com/MetaCubeX/go/releases/download/build'
           go-version: '1.26'
+          cache: false
 
       - name: Apply Patches
         run: |
-          cd $(go env GOROOT)
-          for p in $GITHUB_WORKSPACE/.github/patch/*.patch; do patch --verbose -p 1 < "$p"; done
+          cd "$(go env GOROOT)"
+          for p in "$GITHUB_WORKSPACE"/.github/patch/*.patch; do
+            patch --batch --forward -p 1 < "$p"
+          done
 
       - uses: actions/cache@v5
         with:
           path: |
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-go1.26-${{ hashFiles('.github/patch/*.patch') }}-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-
+            ${{ runner.os }}-${{ runner.arch }}-go1.26-${{ hashFiles('.github/patch/*.patch') }}-
 
       - name: Update CA
         run: |
-          sudo apt-get update && sudo apt-get install ca-certificates
           sudo update-ca-certificates
+          test -s /etc/ssl/certs/ca-certificates.crt
           cp -f /etc/ssl/certs/ca-certificates.crt core/src/foss/golang/clash/component/ca/ca-certificates.crt
 
       - name: Signing properties
@@ -59,40 +81,99 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: |
-          touch signing.properties
-          echo keystore.password="$SIGNING_STORE_PASSWORD" > signing.properties
-          echo key.alias="$SIGNING_KEY_ALIAS" >> signing.properties
-          echo key.password="$SIGNING_KEY_PASSWORD" >> signing.properties
-            
-          echo "cat signing.properties"
-          cat signing.properties
+          umask 077
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          def escape(value):
+              data = value.encode('utf-16-be')
+              return ''.join('\\u%04x' % int.from_bytes(data[i:i+2], 'big')
+                             for i in range(0, len(data), 2))
+
+          properties = {
+              'keystore.password': os.environ['SIGNING_STORE_PASSWORD'],
+              'key.alias': os.environ['SIGNING_KEY_ALIAS'],
+              'key.password': os.environ['SIGNING_KEY_PASSWORD'],
+          }
+          Path('signing.properties').write_text(
+              ''.join(f'{key}={escape(value)}\n' for key, value in properties.items()),
+              encoding='ascii',
+          )
+          PY
 
       - name: Pre-release Build
-        if: success()
-        run: ./gradlew --no-daemon app:assembleAlphaRelease
+        run: ./gradlew --no-daemon --stacktrace app:assembleAlphaRelease
 
-      # Delete old Prerelease-alpha
-      - uses: dev-drprasad/delete-tag-and-release@v1.1
+      - name: Verify APKs and generate checksums
+        run: |
+          cd app/build/outputs/apk/alpha/release
+          shopt -s nullglob
+          apks=(*.apk)
+          test "${#apks[@]}" -eq 5
+          signer=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -n 1)
+          test -n "$signer"
+          for apk in "${apks[@]}"; do
+            test -s "$apk"
+            "$signer" verify "$apk"
+          done
+          sha256sum "${apks[@]}" > SHA256SUMS.txt
+
+      - name: Save APKs even if release upload fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: cmfa-alpha-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            app/build/outputs/apk/alpha/release/*.apk
+            app/build/outputs/apk/alpha/release/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Prevent an old run from replacing a newer release
+        id: current
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          latest=$(gh api "repos/$GH_REPO/commits/main" --jq .sha)
+          if [ "$latest" = "$GITHUB_SHA" ]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "main 已有新提交；本次 APK 保留在 Artifacts，跳过滚动发布。" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Alpha
+        uses: softprops/action-gh-release@v3
+        if: steps.current.outputs.publish == 'true'
         with:
           tag_name: Prerelease-alpha
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          delete_release: true
+          target_commitish: ${{ github.sha }}
+          name: CMFA 美化版 · 自动构建
+          files: |
+            app/build/outputs/apk/alpha/release/*.apk
+            app/build/outputs/apk/alpha/release/SHA256SUMS.txt
+          fail_on_unmatched_files: true
+          prerelease: true
+          make_latest: false
+          body: |
+            自动同步上游并保留本仓库美化后的签名 APK。
 
-      - name: Tag Repo
+            - 源码提交：${{ github.sha }}
+            - 构建记录：https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - 一般安卓手机选择 `arm64-v8a`；不确定架构时选择 `universal`。
+            - 下载后可用 `SHA256SUMS.txt` 校验；旧版本附件保留。
+
+      # 上传成功后才移动滚动 tag；不删除已有 Release 和全部附件。
+      - name: Update rolling tag after upload
+        if: steps.current.outputs.publish == 'true'
         uses: richardsimko/update-tag@v3
         with:
           tag_name: Prerelease-alpha
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Upload Alpha
-        uses: softprops/action-gh-release@v3
-        if: ${{  success() }}
-        with:
-          tag_name: Prerelease-alpha
-          files: app/build/outputs/apk/alpha/release/*
-          prerelease: true
-          generate_release_notes: true
-
-      - name: Release Changelog Builder
-        uses: mikepenz/release-changelog-builder-action@v6
+      - name: Clean signing properties
+        if: always()
+        run: rm -f signing.properties
