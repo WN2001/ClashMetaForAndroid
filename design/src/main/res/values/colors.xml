@@ -1,49 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 主色：现代蓝紫，Android 12 以下兜底 -->
-    <color name="color_clash_light">#445AC0</color>
-    <color name="color_clash_dark">#BAC3FF</color>
-
-    <!-- 系统栏遮罩 -->
+    <color name="color_theme_seed">#D8C0C3</color>
+    <color name="color_dark_on_primary">#4C2532</color>
+    <color name="color_clash_light">#825260</color>
+    <color name="color_clash_dark">#F5B5C7</color>
     <color name="color_system_ui_overlay">#50000000</color>
-
-    <!-- 浅色背景/表面：背景微紫白，卡片纯白，形成微妙层次 -->
-    <color name="color_light_background">#FBF8FF</color>
-    <color name="color_light_surface">#FFFFFF</color>
-
-    <!-- 深色背景/表面：提高对比度，卡片更突出 -->
-    <color name="color_dark_background">#121318</color>
-    <color name="color_dark_surface">#25242E</color>
-
-    <!-- 停止/禁用态 -->
-    <color name="color_light_clash_stopped">#71707A</color>
-    <color name="color_light_control_disabled">#E7E0EC</color>
-    <color name="color_dark_control_disabled">#474552</color>
-
-    <!-- M3 容器色（Android<12 品牌兜底；Android 12+ 由 DynamicColors 覆盖） -->
-    <!-- 浅色 -->
-    <color name="color_light_primary_container">#DEE0FF</color>
-    <color name="color_light_on_primary_container">#00105C</color>
-    <color name="color_light_secondary_container">#E3E1EC</color>
-    <color name="color_light_on_secondary_container">#2A2933</color>
-    <color name="color_light_surface_variant">#E3E1EC</color>
-    <color name="color_light_on_surface_variant">#46464F</color>
-    <color name="color_light_surface_container_high">#E3E0EC</color>
-    <color name="color_light_outline_variant">#C5C5D0</color>
-    <!-- 深色 -->
-    <color name="color_dark_primary_container">#2A3389</color>
-    <color name="color_dark_on_primary_container">#DEE0FF</color>
-    <color name="color_dark_secondary_container">#3A3850</color>
-    <color name="color_dark_on_secondary_container">#E6E0F4</color>
-    <color name="color_dark_surface_variant">#46464F</color>
-    <color name="color_dark_on_surface_variant">#C7C5D0</color>
-    <color name="color_dark_surface_container_high">#33313C</color>
-    <color name="color_dark_outline_variant">#474552</color>
-
-    <!-- 错误色 -->
+    <color name="color_light_background">#FFF8F9</color>
+    <color name="color_light_surface">#FFF8F9</color>
+    <color name="color_dark_background">#181214</color>
+    <color name="color_dark_surface">#181214</color>
+    <color name="color_light_clash_stopped">#736267</color>
+    <color name="color_light_control_disabled">#EDE0E3</color>
+    <color name="color_dark_control_disabled">#504348</color>
+    <color name="color_light_primary_container">#FFD9E3</color>
+    <color name="color_light_on_primary_container">#663A47</color>
+    <color name="color_light_secondary_container">#F1DDE3</color>
+    <color name="color_light_on_secondary_container">#554149</color>
+    <color name="color_light_surface_variant">#EFE0E4</color>
+    <color name="color_light_on_surface_variant">#524348</color>
+    <color name="color_light_surface_container_high">#F2E7EA</color>
+    <color name="color_light_outline_variant">#D5C2C8</color>
+    <color name="color_dark_primary_container">#663A47</color>
+    <color name="color_dark_on_primary_container">#FFD9E3</color>
+    <color name="color_dark_secondary_container">#554149</color>
+    <color name="color_dark_on_secondary_container">#F1DDE3</color>
+    <color name="color_dark_surface_variant">#504348</color>
+    <color name="color_dark_on_surface_variant">#D5C2C8</color>
+    <color name="color_dark_surface_container_high">#32282C</color>
+    <color name="color_dark_outline_variant">#504348</color>
     <color name="color_error">#FFB00020</color>
     <color name="proxy_delay_fast">#176B45</color>
     <color name="proxy_delay_slow">#865200</color>
     <color name="proxy_delay_fast_dark">#88D8AE</color>
     <color name="proxy_delay_slow_dark">#F2C078</color>
+    <color name="color_light_surface_container_low">#FCF1F4</color>
+    <color name="color_light_surface_container">#F7ECEF</color>
+    <color name="color_dark_surface_container_low">#21191D</color>
+    <color name="color_dark_surface_container">#281F23</color>
+    <color name="color_light_on_surface">#21191D</color>
+    <color name="color_dark_on_surface">#EDE0E4</color>
+    <color name="color_light_tertiary">#765B36</color>
+    <color name="color_dark_tertiary">#E3C294</color>
 </resources>

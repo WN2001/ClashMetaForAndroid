@@ -7,6 +7,10 @@ import android.view.ContextThemeWrapper
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.view.children
+import com.github.kr328.clash.design.component.ProxyPageFactory
 import com.github.kr328.clash.design.adapter.ProxyAdapter
 import com.github.kr328.clash.design.adapter.ProxyPageAdapter
 import com.github.kr328.clash.core.model.Proxy
@@ -191,5 +195,67 @@ class DashboardUiTest {
         assertEquals(0, changed)
         pages.updateAdapter(0, listOf(proxies[0], proxies[1].copy(delay = 180)), true, parent, emptyMap())
         assertEquals(1, changed)
+    }
+
+    private fun exerciseColumnSwitches(width: Int, dark: Boolean) = runBlocking {
+        val config = ProxyViewConfig(context(dark), 2)
+        val nodes = List(40) { index -> Proxy("node-$index",
+            listOf("🇭🇰 香港 · Hong Kong Premium", "🇯🇵 东京 · Tokyo Reality", "🇸🇬 Singapore 新加坡", "🇺🇸 Los Angeles 洛杉矶")[index % 4],
+            "VLESS / Reality", "VLESS", if (index % 7 == 0) Short.MAX_VALUE.toInt() else 40 + index * 17, false) }
+        val parent = ProxyState("node-0")
+        val pages = ProxyPageAdapter(Surface(), config, List(2) { ProxyAdapter(config) {} }) {}
+        for (page in 0..1) pages.updateAdapter(page, nodes, true, parent, emptyMap())
+        val host = RecyclerView(config.context).apply {
+            layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+            adapter = pages
+            itemAnimator = null
+        }
+        layout(host, width, 700)
+        fun grid() = (host.getChildAt(0).tag as ProxyPageFactory.Holder).recyclerView
+        for (columns in listOf(2, 3, 1, 3, 2, 1)) {
+            pages.updateColumns(columns)
+            layout(host, width, 700)
+            val list = grid()
+            assertEquals(columns, (list.layoutManager as GridLayoutManager).spanCount)
+            assertTrue(list.childCount >= columns)
+            val rowTops = mutableMapOf<Int, Int>()
+            list.children.forEach { child ->
+                val position = list.getChildAdapterPosition(child)
+                assertTrue(child.left >= list.paddingLeft)
+                assertTrue(child.right <= list.width - list.paddingRight)
+                assertTrue(kotlin.math.abs(child.width * columns - (list.width - list.paddingLeft - list.paddingRight)) <= columns)
+                val row = position / columns
+                val existing = rowTops.put(row, child.top)
+                if (existing != null) assertEquals(existing, child.top)
+                assertTrue(child.height > 0)
+                assertTrue(child.contentDescription.toString().contains(nodes[position].title))
+            }
+            snapshot(host, "grid-${if (dark) "dark" else "light"}-$columns-$width")
+        }
+        grid().scrollToPosition(18)
+        layout(host, width, 700)
+        val anchor = (grid().layoutManager as GridLayoutManager).findFirstVisibleItemPosition()
+        pages.updateColumns(3)
+        layout(host, width, 700)
+        val first = (grid().layoutManager as GridLayoutManager).findFirstVisibleItemPosition()
+        assertTrue(first <= anchor && anchor - first < 3)
+        host.scrollToPosition(1)
+        layout(host, width, 700)
+        assertEquals(3, (grid().layoutManager as GridLayoutManager).spanCount)
+        assertEquals(40, grid().adapter!!.itemCount)
+    }
+
+    @Test fun liveGridSwitchesColumnsWhileScrolledAndRecyclesPages() {
+        exerciseColumnSwitches(360, false)
+        exerciseColumnSwitches(360, true)
+    }
+
+    @Test @Config(qualifiers = "zh-rCN-w320dp-h1000dp-mdpi")
+    fun narrowGridWithLargeTextSurvivesRepeatedColumnSwitches() {
+        val app = RuntimeEnvironment.getApplication()
+        val configuration = android.content.res.Configuration(app.resources.configuration)
+        configuration.fontScale = 1.5f
+        app.resources.updateConfiguration(configuration, app.resources.displayMetrics)
+        exerciseColumnSwitches(320, false)
     }
 }

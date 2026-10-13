@@ -31,6 +31,13 @@ class ProxyPageAdapter(
     val states = List(adapters.size) { ProxyPageState() }
     private val updateLocks = List(adapters.size) { Mutex() }
 
+    fun updateColumns(columns: Int) {
+        val next = columns.coerceIn(1, 3)
+        if (config.proxyLine == next) return
+        config.proxyLine = next
+        parent?.children?.forEach { factory.updateColumns(factory.fromRoot(it).recyclerView) }
+    }
+
     suspend fun updateAdapter(
         position: Int,
         proxies: List<Proxy>,
@@ -81,7 +88,8 @@ class ProxyPageAdapter(
         val toolbarHeight = config.context.getPixels(R.dimen.toolbar_height)
         val tabHeight = config.context.getPixels(R.dimen.tab_layout_height)
 
-        holder.recyclerView.bindInsets(surface, toolbarHeight + tabHeight)
+        holder.recyclerView.bindInsets(surface, toolbarHeight + tabHeight,
+            bottom = (80 * config.density).toInt(), horizontal = (8 * config.density).toInt())
         holder.recyclerView.addScrolledToBottomObserver { view, bottom ->
             val position = view.position
             val state = states[position]
@@ -105,6 +113,7 @@ class ProxyPageAdapter(
             this.position = position
             this.swapAdapter(adapter, false)
         }
+        factory.updateColumns(holder.recyclerView)
     }
 
     override fun getItemCount(): Int {

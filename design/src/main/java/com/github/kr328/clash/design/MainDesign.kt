@@ -45,6 +45,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
         withContext(Dispatchers.Main) {
             if (binding.clashRunning != running) {
                 binding.clashRunning = running
+                binding.statusCard.setTone(if (running) binding.colorClashStarted else binding.colorClashStopped)
                 if (!running) {
                     setSpeedLabels("0 B", "0 B")
                     binding.trafficChart.clear()
@@ -115,6 +116,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
         binding.forwarded = "0 B"
         binding.colorClashStarted = context.resolveThemedColor(com.google.android.material.R.attr.colorPrimaryContainer)
         binding.colorClashStopped = context.resolveThemedColor(com.google.android.material.R.attr.colorSurfaceContainerHigh)
+        binding.statusCard.setTone(binding.colorClashStopped)
     }
 
     fun request(request: Request) {
