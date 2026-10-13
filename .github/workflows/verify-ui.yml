@@ -1,0 +1,38 @@
+name: Verify UI
+
+on:
+  pull_request:
+    paths: ['design/**', 'app/**', 'core/src/main/java/**', 'gradle.properties', 'gradle/libs.versions.toml', '.github/workflows/verify-ui.yml']
+  push:
+    branches: [main]
+    paths: ['design/**', 'app/**', 'core/src/main/java/**', 'gradle.properties', 'gradle/libs.versions.toml', '.github/workflows/verify-ui.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ui:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Compile app and render native UI regression tests
+        env:
+          UI_SCREENSHOTS: '1'
+        run: ./gradlew --no-daemon --stacktrace :design:testAlphaDebugUnitTest :app:compileAlphaDebugKotlin
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cmfa-ui-checks
+          path: |
+            design/build/ui-screenshots/*.png
+            design/build/reports/tests/testAlphaDebugUnitTest/**
+          if-no-files-found: warn

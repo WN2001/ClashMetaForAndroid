@@ -17,25 +17,29 @@ fun Traffic.trafficTotal(): String {
     return trafficString(upload + download)
 }
 
+fun Traffic.trafficUploadBytes(): Long = scaleTraffic(this ushr 32) / 100
+
+fun Traffic.trafficDownloadBytes(): Long = scaleTraffic(this and 0xFFFFFFFF) / 100
+
 private fun trafficString(scaled: Long): String {
     return when {
-        scaled > 1024 * 1024 * 1024 * 100L -> {
+        scaled >= 1024 * 1024 * 1024 * 100L -> {
             val data = scaled / 1024 / 1024 / 1024
 
             String.format("%.2f GiB", data.toFloat() / 100)
         }
-        scaled > 1024 * 1024 * 100L -> {
+        scaled >= 1024 * 1024 * 100L -> {
             val data = scaled / 1024 / 1024
 
             String.format("%.2f MiB", data.toFloat() / 100)
         }
-        scaled > 1024 * 100L -> {
+        scaled >= 1024 * 100L -> {
             val data = scaled / 1024
 
             String.format("%.2f KiB", data.toFloat() / 100)
         }
         else -> {
-            "$scaled Bytes"
+            "${scaled / 100} B"
         }
     }
 }
@@ -45,7 +49,8 @@ private fun scaleTraffic(value: Long): Long {
     val data = value and 0x3FFFFFFF
 
     return when (type) {
-        0L -> data
+        // Native byte words are integers; larger units store hundredths.
+        0L -> data * 100
         1L -> data * 1024
         2L -> data * 1024 * 1024
         3L -> data * 1024 * 1024 * 1024

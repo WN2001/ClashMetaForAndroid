@@ -112,6 +112,9 @@ jobs:
           )
           PY
 
+      - name: Verify UI before packaging
+        run: ./gradlew --no-daemon --stacktrace :design:testAlphaDebugUnitTest
+
       - name: Pre-release Build
         run: ./gradlew --no-daemon --stacktrace app:assembleAlphaRelease
 

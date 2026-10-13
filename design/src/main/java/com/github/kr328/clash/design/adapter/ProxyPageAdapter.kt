@@ -2,17 +2,22 @@ package com.github.kr328.clash.design.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.core.view.children
 import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.design.R
 import com.github.kr328.clash.design.component.ProxyPageFactory
 import com.github.kr328.clash.design.component.ProxyViewConfig
 import com.github.kr328.clash.design.component.ProxyViewState
+import com.github.kr328.clash.design.component.ProxyView
 import com.github.kr328.clash.design.model.ProxyPageState
 import com.github.kr328.clash.design.model.ProxyState
 import com.github.kr328.clash.design.ui.Surface
 import com.github.kr328.clash.design.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class ProxyPageAdapter(
     private val surface: Surface,
@@ -24,6 +29,7 @@ class ProxyPageAdapter(
     private var parent: RecyclerView? = null
 
     val states = List(adapters.size) { ProxyPageState() }
+    private val updateLocks = List(adapters.size) { Mutex() }
 
     suspend fun updateAdapter(
         position: Int,
@@ -31,8 +37,10 @@ class ProxyPageAdapter(
         selectable: Boolean,
         parent: ProxyState,
         links: Map<String, ProxyState>
-    ) {
-        val states = withContext(Dispatchers.Default) {
+    ) = updateLocks[position].withLock {
+        val adapter = adapters[position]
+        val previous = withContext(Dispatchers.Main) { adapter.states to adapter.selectable }
+        val next = withContext(Dispatchers.Default) {
             proxies.map {
                 val link = if (it.isGroup) links[it.name] else null
 
@@ -40,19 +48,31 @@ class ProxyPageAdapter(
             }
         }
 
-        withContext(Dispatchers.Main) {
-            adapters[position].apply {
-                this.selectable = selectable
-                this.swapDataSet(this::states, states, false)
-            }
+        val diff = withContext(Dispatchers.Default) {
+            DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+                override fun getOldListSize() = previous.first.size
+                override fun getNewListSize() = next.size
+                override fun areItemsTheSame(old: Int, new: Int) =
+                    previous.first[old].proxy.name == next[new].proxy.name
+                override fun areContentsTheSame(old: Int, new: Int) =
+                    previous.second == selectable && previous.first[old].proxy == next[new].proxy
+            }, false)
+        }
 
+        withContext(Dispatchers.Main) {
+            adapter.selectable = selectable
+            adapter.states = next
+            diff.dispatchUpdatesTo(adapter)
             requestRedrawVisible()
         }
     }
 
     fun requestRedrawVisible() {
-        factory.fromRoot(parent?.firstVisibleView ?: return)
-            .recyclerView.invalidateChildren()
+        parent?.children?.forEach { page ->
+            factory.fromRoot(page).recyclerView.children.forEach { view ->
+                (view as? ProxyView)?.refreshState()
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProxyPageFactory.Holder {

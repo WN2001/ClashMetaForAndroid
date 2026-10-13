@@ -1,204 +1,194 @@
 package com.github.kr328.clash.design.component
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
-import android.view.MotionEvent
+import android.graphics.RectF
+import android.graphics.Typeface
+import android.text.TextPaint
+import android.text.TextUtils
+import android.text.Layout
+import android.text.StaticLayout
+import android.os.Build
 import android.view.View
+import androidx.core.graphics.ColorUtils
 import com.github.kr328.clash.common.compat.getDrawableCompat
-import com.github.kr328.clash.design.store.UiStore
+import com.github.kr328.clash.design.util.animationsEnabled
 
 class ProxyView(
     context: Context,
-    config: ProxyViewConfig,
+    private val config: ProxyViewConfig,
 ) : View(context) {
+    private val cardBounds = RectF()
+    private val badgeBounds = RectF()
+    private val clip = Path()
+    private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
+    private val titlePaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = Typeface.DEFAULT_BOLD }
+    private val subtitlePaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+    private val delayPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = Typeface.DEFAULT_BOLD }
+    private var title = ""
+    private var titleLayout: StaticLayout? = null
+    private var subtitle = ""
+    private var delayText = ""
+    private var titleY = 0f
+    private var subtitleY = 0f
+    private var contentLeft = 0f
+    private var selection = 0f
+    private var selectionAnimator: ValueAnimator? = null
+
+    var state: ProxyViewState? = null
+        set(value) {
+            selectionAnimator?.cancel()
+            field = value
+            value?.update()
+            selection = if (value?.selected == true) 1f else 0f
+            updateTextLayout()
+            requestLayout()
+            invalidate()
+        }
+
+    constructor(context: Context) : this(context, ProxyViewConfig(context, 2))
 
     init {
         background = context.getDrawableCompat(config.clickableBackground)
+    }
 
-        // 按下轻微缩放反馈：按下 0.96，松开回弹（不消费事件，保持 ripple 与点击）
-        setOnTouchListener { view, event ->
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN ->
-                    view.animate().scaleX(0.96f).scaleY(0.96f)
-                        .setDuration(80)
-                        .start()
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL ->
-                    view.animate().scaleX(1f).scaleY(1f)
-                        .setDuration(160)
-                        .start()
+    fun refreshState(animate: Boolean = true) {
+        val current = state ?: return
+        if (!current.update()) return
+        updateTextLayout()
+        contentDescription = "${current.title}, ${current.subtitle}, ${current.delayText}"
+        isSelected = current.selected
+        val target = if (current.selected) 1f else 0f
+        selectionAnimator?.cancel()
+        if (animate && isAttachedToWindow && context.animationsEnabled() && selection != target) {
+            selectionAnimator = ValueAnimator.ofFloat(selection, target).apply {
+                duration = 180
+                addUpdateListener {
+                    selection = it.animatedValue as Float
+                    postInvalidateOnAnimation()
+                }
+                start()
             }
-            false
+        } else {
+            selection = target
+            invalidate()
         }
     }
 
-    var state: ProxyViewState? = null
-    constructor(context: Context) : this(context, ProxyViewConfig(context, 2))
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val state = state ?: return super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        titlePaint.textSize = config.textSize
+        subtitlePaint.textSize = config.subtitleSize
+        val titleLines = if (config.proxyLine == 1 || Build.VERSION.SDK_INT < 23) 1 else 2
+        val textHeight = titlePaint.fontSpacing * titleLines + subtitlePaint.fontSpacing
+        val desired = (config.layoutPadding * 2 + config.contentPadding * 2 + textHeight + 12 * config.density).toInt()
+        setMeasuredDimension(
+            resolveSize(resources.displayMetrics.widthPixels, widthMeasureSpec),
+            resolveSize(desired, heightMeasureSpec),
+        )
+    }
 
-        val width = when (MeasureSpec.getMode(widthMeasureSpec)) {
-            MeasureSpec.UNSPECIFIED ->
-                resources.displayMetrics.widthPixels
-            MeasureSpec.AT_MOST, MeasureSpec.EXACTLY ->
-                MeasureSpec.getSize(widthMeasureSpec)
-            else ->
-                throw IllegalArgumentException("invalid measure spec")
-        }
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        cardBounds.set(config.layoutPadding, config.layoutPadding, w - config.layoutPadding, h - config.layoutPadding)
+        clip.rewind()
+        clip.addRoundRect(cardBounds, config.cardRadius, config.cardRadius, Path.Direction.CW)
+        updateTextLayout()
+    }
 
-        state.paint.apply {
-            reset()
-
-            textSize = state.config.textSize
-
-            getTextBounds("Stub!", 0, 1, state.rect)
-        }
-
-        val textHeight = state.rect.height()
-        val exceptHeight = (state.config.layoutPadding * 2 +
-                state.config.contentPadding * 2 +
-                textHeight * 2 +
-                state.config.textMargin).toInt()
-
-        val height = when (MeasureSpec.getMode(heightMeasureSpec)) {
-            MeasureSpec.UNSPECIFIED ->
-                exceptHeight
-            MeasureSpec.AT_MOST, MeasureSpec.EXACTLY ->
-                exceptHeight.coerceAtMost(MeasureSpec.getSize(heightMeasureSpec))
-            else ->
-                throw IllegalArgumentException("invalid measure spec")
-        }
-
-        setMeasuredDimension(width, height)
+    private fun updateTextLayout() {
+        val current = state ?: return
+        titlePaint.textSize = config.textSize
+        subtitlePaint.textSize = config.subtitleSize
+        delayPaint.textSize = config.subtitleSize
+        contentLeft = config.layoutPadding + config.contentPadding
+        val contentRight = (width - contentLeft).coerceAtLeast(contentLeft)
+        titleY = config.layoutPadding + config.contentPadding - titlePaint.ascent()
+        subtitleY = height - config.layoutPadding - config.contentPadding - subtitlePaint.descent()
+        val titleWidth = (contentRight - contentLeft - if (current.selected) 20 * config.density else 0f).coerceAtLeast(0f)
+        title = TextUtils.ellipsize(current.title, titlePaint, titleWidth, TextUtils.TruncateAt.END).toString()
+        titleLayout = if (Build.VERSION.SDK_INT >= 23 && config.proxyLine != 1) {
+            StaticLayout.Builder.obtain(current.title, 0, current.title.length, titlePaint, titleWidth.toInt().coerceAtLeast(1))
+                .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                .setMaxLines(2)
+                .setEllipsize(TextUtils.TruncateAt.END)
+                .setIncludePad(false)
+                .build()
+        } else null
+        val badgePadding = 5 * config.density
+        val maxBadgeWidth = ((contentRight - contentLeft) * 0.55f - badgePadding * 2).coerceAtLeast(0f)
+        delayText = TextUtils.ellipsize(current.delayText, delayPaint, maxBadgeWidth, TextUtils.TruncateAt.END).toString()
+        val delayWidth = delayPaint.measureText(delayText)
+        badgeBounds.set(
+            contentRight - delayWidth - badgePadding * 2,
+            subtitleY + delayPaint.ascent() - 3 * config.density,
+            contentRight,
+            subtitleY + delayPaint.descent() + 3 * config.density,
+        )
+        val subtitleWidth = (badgeBounds.left - contentLeft - 6 * config.density).coerceAtLeast(0f)
+        subtitle = TextUtils.ellipsize(current.subtitle, subtitlePaint, subtitleWidth, TextUtils.TruncateAt.END).toString()
     }
 
     override fun draw(canvas: Canvas) {
-        val state = state ?: return super.draw(canvas)
-
-        if (state.update(false))
-            postInvalidate()
-
-        val width = width.toFloat()
-        val height = height.toFloat()
-
-        val paint = state.paint
-
-        paint.reset()
-
-        paint.color = state.background
-        paint.style = Paint.Style.FILL
-
-        // draw background
-        canvas.apply {
-            if (state.config.proxyLine==1) {
-                drawRect(0f, 0f, width, height, paint)
-            } else {
-                val path = state.path
-
-                path.reset()
-
-                path.addRoundRect(
-                    state.config.layoutPadding,
-                    state.config.layoutPadding,
-                    width - state.config.layoutPadding,
-                    height - state.config.layoutPadding,
-                    state.config.cardRadius,
-                    state.config.cardRadius,
-                    Path.Direction.CW,
-                )
-
-                drawPath(path, paint)
-
-                clipPath(path)
-            }
-        }
-
+        if (state == null) return super.draw(canvas)
+        val saved = canvas.save()
+        canvas.clipPath(clip)
+        fillPaint.color = ColorUtils.blendARGB(config.unselectedBackground, config.selectedBackground, selection)
+        canvas.drawRoundRect(cardBounds, config.cardRadius, config.cardRadius, fillPaint)
         super.draw(canvas)
+        canvas.restoreToCount(saved)
+        strokePaint.color = if (isFocused) config.primaryColor else ColorUtils.blendARGB(config.outlineColor, config.primaryColor, selection)
+        strokePaint.strokeWidth = config.density * if (isFocused) 2 else 1
+        canvas.drawRoundRect(cardBounds, config.cardRadius, config.cardRadius, strokePaint)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        val state = state ?: return
-
-        val paint = state.paint
-
-        val width = width.toFloat()
-        val height = height.toFloat()
-
-        paint.textSize = state.config.textSize
-
-        // measure delay text bounds
-        val delayCount = paint.breakText(
-            state.delayText,
-            false,
-            (width - state.config.layoutPadding * 2 - state.config.contentPadding * 2)
-                .coerceAtLeast(0f),
-            null
-        )
-
-        state.paint.getTextBounds(state.delayText, 0, delayCount, state.rect)
-
-        val delayWidth = state.rect.width()
-
-        val mainTextWidth = (width -
-                state.config.layoutPadding * 2 -
-                state.config.contentPadding * 2 -
-                delayWidth -
-                state.config.textMargin * 2
-                )
-            .coerceAtLeast(0f)
-
-        // measure title text bounds
-        val titleCount = paint.breakText(
-            state.title,
-            false,
-            mainTextWidth,
-            null,
-        )
-
-        // measure subtitle text bounds
-        val subtitleCount = paint.breakText(
-            state.subtitle,
-            false,
-            mainTextWidth,
-            null,
-        )
-
-        // text draw measure
-        val textOffset = (paint.descent() + paint.ascent()) / 2
-
-        paint.reset()
-
-        paint.textSize = state.config.textSize
-        paint.isAntiAlias = true
-        paint.color = state.controls
-
-        // draw delay
-        canvas.apply {
-            val x = width - state.config.layoutPadding - state.config.contentPadding - delayWidth
-            val y = height / 2f - textOffset
-
-            drawText(state.delayText, 0, delayCount, x, y, paint)
+        val current = state ?: return
+        val control = ColorUtils.blendARGB(config.unselectedControl, config.selectedControl, selection)
+        titlePaint.color = control
+        subtitlePaint.color = ColorUtils.blendARGB(config.subtitleColor, config.selectedControl, selection)
+        delayPaint.color = if (current.selected) config.selectedControl else current.delayColor
+        val cachedTitle = titleLayout
+        if (cachedTitle != null) {
+            val save = canvas.save()
+            canvas.translate(contentLeft, config.layoutPadding + config.contentPadding)
+            cachedTitle.draw(canvas)
+            canvas.restoreToCount(save)
+        } else {
+            canvas.drawText(title, contentLeft, titleY, titlePaint)
         }
-
-        // draw title
-        canvas.apply {
-            val x = state.config.layoutPadding + state.config.contentPadding
-            val y = state.config.layoutPadding +
-                    (height - state.config.layoutPadding * 2) / 3f - textOffset
-
-            drawText(state.title, 0, titleCount, x, y, paint)
+        canvas.drawText(subtitle, contentLeft, subtitleY, subtitlePaint)
+        fillPaint.color = ColorUtils.setAlphaComponent(delayPaint.color, 18)
+        canvas.drawRoundRect(badgeBounds, 6 * config.density, 6 * config.density, fillPaint)
+        canvas.drawText(delayText, badgeBounds.left + 5 * config.density, subtitleY, delayPaint)
+        if (current.selected) {
+            canvas.drawText("✓", width - contentLeft - 16 * config.density, titleY, titlePaint)
         }
+    }
 
-        // draw subtitle
-        canvas.apply {
-            val x = state.config.layoutPadding + state.config.contentPadding
-            val y = state.config.layoutPadding +
-                    (height - state.config.layoutPadding * 2) / 3f * 2 - textOffset
-
-            drawText(state.subtitle, 0, subtitleCount, x, y, paint)
+    override fun drawableStateChanged() {
+        super.drawableStateChanged()
+        if (!isAttachedToWindow) return
+        val scale = if (isPressed) 0.985f else 1f
+        if (context.animationsEnabled()) {
+            animate().scaleX(scale).scaleY(scale).setDuration(if (isPressed) 70 else 140).start()
+        } else {
+            scaleX = scale
+            scaleY = scale
         }
+        invalidate()
+    }
+
+    override fun onDetachedFromWindow() {
+        selectionAnimator?.cancel()
+        selectionAnimator = null
+        selection = if (state?.selected == true) 1f else 0f
+        animate().cancel()
+        scaleX = 1f
+        scaleY = 1f
+        super.onDetachedFromWindow()
     }
 }
